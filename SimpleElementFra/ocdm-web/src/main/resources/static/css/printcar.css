@@ -1,0 +1,72 @@
+/*css reset*/
+@charset "utf-8";
+html,body { width:100%; height:100%; font-family:"SimSun"; margin:0px; padding:0px; font-size:14px; color:#000000; background:#fff;}
+img{ border:none;}
+ul, li { list-style:none; text-decoration:none; margin:0px; padding:0px;}
+h1, h2, h3, h4, h5, h6, form, dl, dt, dd, p{ margin:0px; padding:0px;}
+a{ text-decoration:none;}
+.fl{ float:left;}
+.fr{ float:right;}
+.clearfloat:after{ display:block; clear:both; content:""; visibility:hidden; height:0;}
+.clearfloat{ zoom:1;}
+.marbtm5{ margin-bottom:5px;}
+.marbtm10{ margin-bottom:10px;}
+.marbtm20{ margin-bottom:20px;}
+.marbtm30{ margin-bottom:30px;}
+.marght10{ margin-right:10px;}
+.marght20{ margin-right:20px;}
+.marght30{ margin-right:30px;}
+.marghtqz{ margin-right:100px;}
+.marlft5{ margin-left: 5px;}
+[v-cloak] { display: none; }/*隐藏未编译的{{}}直到实例准备完毕*/
+
+.contrighton{ padding:20px;}
+.dzimg{ text-align: center;}
+.pth3{ padding-top: 60px; text-align: center; font-size:32px; position: relative;}
+.tbcont{ width:900px; margin:0px auto; }
+
+.printwarp{ width:890px; margin:0px auto;}
+.h1title{ text-align: center; margin-top:20px; }
+.h1downp{ margin:10px 0px;}
+.tablewarp{ width:100%;}
+.bigtable{ width:100%; border-spacing: 0; border-collapse: collapse;}
+.bigtable td{ border:#000 1px solid; vertical-align: middle; text-align: center; padding:5px 5px;}
+.smalltable{ width:100%;}
+.smalltable td{ border:none; padding:5px; vertical-align: middle; text-align: left;}
+.textleft{ text-align: left !important;}
+.widclass{ width:60px;}
+.result{ height:30px; line-height: 30px;}
+.resulttime{ text-align: right; height:30px; line-height: 30px;}
+.carphone{ height:240px; padding:5px 0px;}
+.carphone img{ max-width: 100%; max-height: 100%;}
+.picsmall{ height:80px; padding:5px 0px;}
+.picsmall img{ max-width: 100%; max-height: 100%;}
+.beizhu{ height:210px; padding:5px 0px;}
+.tuoyin{ padding-top:5px !important; padding-bottom: 5px !important;}
+.explainp{ padding-top: 10px; line-height: 25px;}
+.explain{ font-weight: bold;}
+.result1{ height:60px; line-height: 30px;}
+.beizhu1{ height:180px; padding:5px 0px;}
+.kuang{ display: inline-block; width:14px; height:14px; border: #000 1px solid; margin-right: 4px;}
+/*.duihao{ background: url(../img/rt.jpg) no-repeat center;}*/
+
+.bolditem{ font-weight:900; font-family:'SimHei'}
+.smalltd{ width:20px;}
+.lineinput{ display:block; width:100px; height:18px; border-bottom:#000000 1px solid;}
+.largeimg{ width:120px;}
+.largeimg img{ max-width: 120px;}
+.qzimg{ width:100px; height:70px;}
+.qzimg img{ max-width: 100px; max-height: 100%;}
+.boldfont{ font-weight: bold; font-size: 24px;}
+.nametd{ width:80px;}
+.ewmcont{ position: absolute; top:0px; right:100px;}
+
+.btn{ display: inline-block; height:40px; line-height: 40px; padding:0 18px; cursor:pointer; border:none; background:#1E9FFF; color:#fff; border-radius:2px;}
+.btn:hover{ background:#4BB2FF;}
+
+.longtd{ width:600px;}
+.fz{ width:100px;}
+.kong{ width:20px; height:60px;}
+.textright{ text-align: right !important;}
+.smspan{ display: inline-block; width:20px; height:30px;}
+.xmwid{ width:140px;}

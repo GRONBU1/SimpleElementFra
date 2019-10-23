@@ -1,0 +1,157 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="x-ua-compatible" content="IE=Edge">
+    <title>系统管理-权限管理</title>
+    <link rel="shortcut icon" href="img/icon.ico"/>
+    <link rel="stylesheet" href="elementui/index.css">
+    <link rel="stylesheet" href="css/style.css"/>
+</head>
+
+<body>
+<div id="app" class="heiall bigcont" v-cloak>
+    <div id="headerwarp"></div>
+    <div class="content clearfloat">
+        <div id="navwarp" v-show="!isfold"></div>
+        <div class="contright" id="content" :class="{'contrtpad':!isfold,'contrtpadno':isfold}">
+            <div class="contrighton">
+                <div class="contentdiv2">
+                    <div class="marbtm20">
+                        <template>
+                            <el-table :data="tabledata" stripe border style="width: 100%">
+                                <el-table-column label="序号" type="index" width="60">
+                                </el-table-column>
+                                <el-table-column prop="mc" label="角色名称" width="220" show-overflow-tooltip>
+                                </el-table-column>
+                                <el-table-column prop="bz" label="角色描述" show-overflow-tooltip>
+                                </el-table-column>
+                                <el-table-column fixed="right" label="操作" align="center" width="100">
+                                    <template slot-scope="scope">
+                                        <el-button @click="updqx(scope.row)" type="primary" icon="el-icon-info" size="small">权限</el-button>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </template>
+                    </div>
+                </div>
+
+                <el-dialog @keyup.enter.native="qxsubmit" title="权限查看与修改" :visible.sync="qx" width="400px">
+                    <el-tree :data="qxdata" show-checkbox default-expand-all node-key="menuid" ref="tree"
+                             highlight-current :props="defaultProps">
+                    </el-tree>
+                    <span slot="footer" class="dialog-footer">
+							<el-button @click="qx=false">取 消</el-button>
+							<el-button type="primary" @click="qxsubmit">确 定</el-button>
+						</span>
+                </el-dialog>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="elementui/index.js"></script>
+<script src="js/common.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                isfold: false,
+                dialogedit: false,
+                qx: false,
+                delsure: false,
+                tabledata: [],
+                jsid: null,
+                qxdata: [], 
+                myselkeys: [],
+                defaultProps: {
+                    children: 'children',
+                    label: 'mc'
+                },
+            }
+        },
+        methods: {
+            /*导航显示与隐藏*/
+            toggle: function () {
+                this.isfold = !this.isfold;
+            },
+            /*获取数据*/
+            getinfo: function () {
+                var that = this;
+                vehlic.ajax({
+                    type: "post",
+                    url: requesturl + "menuManage/getRoleInfo",
+                    dataType: "json",
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                    },
+                    success: function (res) {
+                        if (res.code == 1) {
+                            that.tabledata = res.data;
+                        } else {
+                            that.$message.error(res.message);
+                        }
+                    }
+                });
+            },
+            /*权限按钮点击事件*/
+            updqx: function (row) {
+                var that = this;
+                that.qx = true;
+                that.defcheck = [];
+                that.jsid = row.id;
+                vehlic.ajax({
+                    type: "post",
+                    url: requesturl + "menuManage/getPermissionInfo",
+                    data: {jsid: that.jsid},
+                    dataType: "json",
+                    cache: false,
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                    },
+                    success: function (res) {
+                        if (res.code == 1) {
+                            that.qxdata = res.qxdata;
+                            that.$refs.tree.setCheckedKeys(res.checkeddata);
+                        } else {
+                            that.$message.error(res.message);
+                        }
+                    }
+                });
+            },
+            /*权限提交事件*/
+            qxsubmit: function () {
+                var that = this;
+                that.qx = false;
+                that.jsmenuids = [];
+                that.myselkeys = that.$refs.tree.getCheckedKeys();
+                vehlic.ajax({
+                    type: "post",
+                    url: requesturl + "menuManage/updateRolePermission",
+                    data: {jsid: that.jsid, menuids: JSON.stringify(that.myselkeys)},
+                    dataType: "json",
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                    },
+                    success: function (res) {
+                        if (res.code == 1) {
+                            that.$message.success(res.message);
+                            that.$refs.tree.setCheckedKeys([]);
+                        } else {
+                            that.$message.error(res.message);
+                        }
+                    }
+                });
+            },
+        },
+        mounted: function () {
+            this.getinfo();
+        }
+    })
+</script>
+
+</html>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xiongdi.ocdm.mapper.dao.SysParamMapper">
+  <resultMap id="BaseResultMap" type="cn.xiongdi.ocdm.mapper.model.SysParam">
+    <id column="csid" jdbcType="BIGINT" property="csid" />
+    <result column="cslb" jdbcType="CHAR" property="cslb" />
+    <result column="csdh" jdbcType="CHAR" property="csdh" />
+    <result column="cssm" jdbcType="CHAR" property="cssm" />
+    <result column="bz1" jdbcType="CHAR" property="bz1" />
+    <result column="bz2" jdbcType="CHAR" property="bz2" />
+    <result column="lbsm" jdbcType="CHAR" property="lbsm" />
+    <result column="editflg" jdbcType="INTEGER" property="editflg" />
+    <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
+    <result column="createuid" jdbcType="CHAR" property="createuid" />
+    <result column="createip" jdbcType="CHAR" property="createip" />
+    <result column="updatetime" jdbcType="TIMESTAMP" property="updatetime" />
+    <result column="updateuid" jdbcType="CHAR" property="updateuid" />
+    <result column="updateip" jdbcType="CHAR" property="updateip" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    csid, cslb, csdh, cssm, bz1, bz2, lbsm, createtime, createuid, createip, updatetime, 
+    updateuid, updateip
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_param
+    where csid = #{csid,jdbcType=BIGINT}
+  </select>
+  <select id="getParamList" resultMap="BaseResultMap" parameterType="cn.xiongdi.ocdm.mapper.model.ParamRq">
+    select * from sys_param where 1=1 AND editflg = 1
+    <if test="cslb!= null and cslb!=''">
+      and cslb=#{cslb,jdbcType=CHAR}
+    </if>
+    <if test="csdh!=null and csdh!=''">
+      AND csdh LIKE concat(concat('%' ,CONCAT('/',#{csdh,jdbcType=CHAR})), '%') ESCAPE '/'
+    </if>
+    order by createtime DESC
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from sys_param
+    where csid = #{csid,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="cn.xiongdi.ocdm.mapper.model.SysParam">
+    INSERT  INTO  sys_param
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      cslb,csdh,
+      <if test="lbsm!=null">
+        lbsm,
+      </if>
+      <if test="editflg!=null">
+        editflg,
+      </if>
+      <if test="cssm!=null">
+        cssm,
+      </if>
+      <if test="bz1!=null">
+        bz1,
+      </if>
+      <if test="bz2!=null">
+        bz2,
+      </if>
+      createtime,createuid,createip
+    </trim>
+    <trim prefix="values(" suffix=")" suffixOverrides=",">
+      #{cslb,jdbcType=CHAR},#{csdh,jdbcType=CHAR},
+      <if test="lbsm!=null">
+        #{lbsm,jdbcType=CHAR},
+      </if>
+      <if test="editflg!=null">
+        #{editflg,jdbcType=INTEGER},
+      </if>
+      <if test="cssm!=null">
+        #{cssm,jdbcType=CHAR},
+      </if>
+      <if test="bz1!=null">
+        #{bz1,jdbcType=CHAR},
+      </if>
+      <if test="bz2!=null">
+        #{bz2,jdbcType=CHAR},
+      </if>
+      NOW(),#{createuid,jdbcType=CHAR},#{createip,jdbcType=CHAR}
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="cn.xiongdi.ocdm.mapper.model.SysParam">
+    update sys_param
+    set
+      csdh = #{csdh,jdbcType=CHAR},
+      cssm = #{cssm,jdbcType=CHAR},
+      bz1 = #{bz1,jdbcType=CHAR},
+      bz2 = #{bz2,jdbcType=CHAR},
+      lbsm = #{lbsm,jdbcType=CHAR},
+      updatetime =NOW(),
+      updateuid = #{updateuid,jdbcType=CHAR},
+      updateip = #{updateip,jdbcType=CHAR}
+    where csid = #{csid,jdbcType=BIGINT}
+  </update>
+  <select id="getCsLb" resultMap="BaseResultMap">
+   select cslb,lbsm from sys_param where editflg=0
+  </select>
+
+  <select id="getValueByCode" resultType="java.lang.String" parameterType="java.lang.String">
+    select a.cssm from sys_param a where a.csdh=#{cssm,jdbcType=CHAR}
+  </select>
+
+  <select id="getParamByCssm" resultMap="BaseResultMap" parameterType="cn.xiongdi.ocdm.mapper.model.ParamRq">
+    select * from sys_param where 1=1 AND editflg = 1
+    <if test="csdh!=null and csdh!=''">
+      AND csdh LIKE concat(concat('%' ,CONCAT('/',#{csdh,jdbcType=CHAR})), '%') ESCAPE '/'
+    </if>
+    <if test="cssm!= null and cssm!=''">
+      and cssm=#{cssm,jdbcType=CHAR}
+    </if>
+  </select>
+
+</mapper>

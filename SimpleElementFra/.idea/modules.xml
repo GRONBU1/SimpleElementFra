@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/ocdm.iml" filepath="$PROJECT_DIR$/ocdm.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ocdm-common/ocdm-common.iml" filepath="$PROJECT_DIR$/ocdm-common/ocdm-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ocdm-mapper/ocdm-mapper.iml" filepath="$PROJECT_DIR$/ocdm-mapper/ocdm-mapper.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ocdm-server/ocdm-server.iml" filepath="$PROJECT_DIR$/ocdm-server/ocdm-server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ocdm-web/ocdm-web.iml" filepath="$PROJECT_DIR$/ocdm-web/ocdm-web.iml" />
+    </modules>
+  </component>
+</project>

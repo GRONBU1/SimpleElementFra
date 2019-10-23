@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html style="overflow:hidden">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="x-ua-compatible" content="IE=Edge">
+    <title>SimpleElementFra系统</title>
+    <link rel="shortcut icon" href="img/cookie.png"/>
+    <link rel="stylesheet" href="elementui/index.css">
+    <link rel="stylesheet" href="css/iconfont/iconfont.css">
+    <link rel="stylesheet" href="css/style.css"/>
+    <style>
+        .el-tabs--border-card > .el-tabs__content {
+            padding: 0;
+            height: 100%;
+            padding-bottom: 40px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+<div id="app" class="heiall bigcont" v-cloak>
+    <p class="hisdlzx fr">在线用户数：{{info.zxyhsl}}</p>
+    <div id="">
+        <div id="head" v-cloak>
+            <div class="headtop clearfloat">
+                <div class="smlogo fl">
+                    <img src="img/cookie.png" style="height: 60px;" alt="">
+                    <span style="display:inline-block;margin-left:15px;vertical-align: top;">
+							<span class="headtoptext">SimpleElementFra系统</span>
+<!--							<span class="white headtoptext2">( 版本号V1.0 )</span>-->
+							<img src="" style="position: absolute;margin-left: 5px;left:111px;bottom:10px;"
+                                 alt="">
+						</span>
+                </div>
+                <div class="usercenter fr">
+                    <span class="white"><img src="../img/top-user.png" alt="" style="vertical-align: -3px;margin-right: 5px;">您好，{{username}}</span>
+                    <span class="white usercenter-btn" @click="changemm"><img src="../img/top-change.png" alt="" style="vertical-align: -3px;margin-right: 5px;"> 修改密码</span>
+                    <span class="white usercenter-btn" @click="logoutsure = true"><img src="../img/top-out.png" alt="" style="vertical-align: -3px;margin-right: 5px;">注销</span>
+                </div>
+            </div>
+            <el-dialog title="修改密码" :visible.sync="passwordVisible" width="400px">
+                <el-form @keyup.enter.native="passwordyz" ref="mmform" :model="mmform" :rules="mmrules"
+                         label-width="80px">
+                    <el-form-item label="原密码" prop="password1">
+                        <el-input type="password" :maxlength="32" placeholder="输入原密码" clearable
+                                  v-model.trim="mmform.password1"></el-input>
+                    </el-form-item>
+                    <el-form-item label="新密码" prop="password2">
+                        <el-input type="password" :maxlength="32" placeholder="输入新密码" clearable
+                                  v-model.trim="mmform.password2"></el-input>
+                    </el-form-item>
+                    <el-form-item label="新密码"  prop="password3">
+                        <el-input type="password" :maxlength="32" placeholder="再次输入新密码" clearable
+                                  v-model.trim="mmform.password3"></el-input>
+                    </el-form-item>
+                </el-form>
+                <span slot="footer" class="dialog-footer">
+						<el-button @click="passwordVisible = false">取 消</el-button>
+						<el-button type="primary" @click="passwordyz">确 定</el-button>
+					</span>
+            </el-dialog>
+            <el-dialog title="提示" :visible.sync="logoutsure" width="400px" top="30vh">
+                <p>确定注销吗？</p>
+                <span slot="footer" class="dialog-footer">
+						<el-button @click="logoutsure = false">取 消</el-button>
+						<el-button type="primary" @click="logouttrue">确 定</el-button>
+					</span>
+            </el-dialog>
+        </div>
+    </div>
+    <div class="content clearfloat">
+        <div class="sidenavon heiall" id="nav" v-cloak>
+            <el-menu class="el-menu-vertical-demo sidenav" @open="handleOpen" @close="handleClose"
+                     @select="handleSelect"
+                     :default-openeds="opened" :unique-opened="true">
+                <template v-for="item in navList">
+                    <el-submenu :index="item.url" :key="item.url">
+                        <template slot="title">
+                            <i :class="item.pic"></i>
+                            <span>{{ item.mc }}</span>
+                        </template>
+                        <el-menu-item v-for="child in item.children" :class="{'navlihas':child.url==actives}"
+                                      :index="child.url" :key="child.url">
+                            <i :class="child.pic"></i>
+                            <span>{{ child.mc }}</span>
+                        </el-menu-item>
+                    </el-submenu>
+                </template>
+            </el-menu>
+        </div>
+        <div ref="content" id="content" style="height:100%" class="contright2">
+            <el-tabs style="height: 100%;" v-model="activeIndex" type="border-card" closable @tab-click="tabClick"
+                     @tab-remove="tabRemove">
+
+                <el-tab-pane  style="height: 100%;" v-for="(item, index) in options" :key="item.url"
+                              :name="item.url">
+                    <span slot="label"><i :class="item.pic"></i> {{item.title}}</span>
+                    <iframe :src="item.url" frameborder="0" style="width:100%;height:100%;"></iframe>
+                </el-tab-pane>
+
+            </el-tabs>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="elementui/index.js"></script>
+<script src="js/common.js"></script>
+<script>
+    var url = location.href.split("?")[0].split("/").pop();
+    var pageUrl = location.href.split("?")[0].split("/").pop();
+    //在月份、日期、小时等小于10时前面补0
+    var padDate = function (value) {
+        return value < 10 ? '0' + value : value;
+    };
+
+    var indexVue = new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                info:{},
+                activeIndex: "home.html",
+                opened: [],
+                options: [
+                    {
+                        url: "home.html",
+                        title: "主页",
+                        pic: 'iconfont-home'
+                    }
+                ],
+                visible: false,
+                actives: url,
+                navList: [],
+                date: new Date(),
+                passwordVisible: false,
+                logoutsure: false,
+                username: '',
+                mmform: {
+                    password1: '',
+                    password2: '',
+                    password3: ''
+                },
+                mmrules: {
+                    password1: [
+                        {required: true, message: '原密码不能为空', trigger: 'blur'}
+                    ],
+                    password2: [{
+                        required: true,
+                        pattern: /^^(?![A-Za-z0-9]+$)(?![A-Za-z\W]+$)(?![0-9\W]+$)[a-zA-Z0-9\W]{8,}$/,
+                        message: '必须包含英文字符、数字及特殊符号,至少要8位长度',
+                        trigger: 'blur'
+                    }],
+                    password3: [{
+                        required: true,
+                        pattern: /^^(?![A-Za-z0-9]+$)(?![A-Za-z\W]+$)(?![0-9\W]+$)[a-zA-Z0-9\W]{8,}$/,
+                        message: '必须包含英文字符、数字及特殊符号,至少要8位长度',
+                        trigger: 'blur'
+                    }]
+                }
+            }
+        },
+        methods: {
+            // 新加tabs
+            addTabs :function(url,name,pic){
+                var that = this;
+                var inTabs = this.options.some(function(value){
+                    if( value.title == name ){
+                        value.url = null
+                        setTimeout(function(){value.url = url;})
+                        
+                    }
+                    return value.title == name;
+                });
+                // 存在
+                if (inTabs) {
+                    this.activeIndex = url;
+                }else{
+                    this.options.push({
+                        url: url,
+                        title: name,
+                        pic: pic
+                    });
+                    this.activeIndex = url;
+                };
+            },
+            //demo提醒
+            // notice: function () {
+            //     var that = this;
+            //     vehlic.ajax({
+            //         type: "post",
+            //         url: requesturl + "needToDo/getNeedToDoCount",
+            //         data: {},
+            //         dataType: "json",
+            //         error: function (XMLHttpRequest, textStatus, errorThrown) {
+            //             that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+            //         },
+            //         success: function (res) {
+            //             if (res.code == 1) {
+            //                 if (res.data.spCount > 0) {
+            //                     that.spNotice(res.data);
+            //                 }else if (res.data.spTwoCount > 0) {
+            //                     that.spTwoNotice(res.data);
+            //                 }
+            //             } else {
+            //                 that.$message.error(res.message);
+            //             }
+            //         }
+            //     });
+            // },
+            handleOpen: function (key, keyPath) {
+            },
+            handleClose: function (key, keyPath) {
+            },
+            tabClick: function (tab) {
+            },
+            tabRemove: function (delName) {
+                var that = this;
+                for (var x = 1; x < that.options.length; x++) {
+                    if (that.options[x].url == delName) {
+                        that.options.splice(x, 1);
+                        if (that.activeIndex == delName) {
+                            that.activeIndex = that.options[x - 1].url;
+                        }
+                    }
+                }
+            },
+            handleSelect: function (key, keyPath) {
+                var that = this;
+                that.actives = key;
+                that.activeIndex = key;
+                // 判断是否存在与tabs中
+                for (var x = 0; x < that.options.length; x++) {
+                    if (that.options[x].url == key) {
+                        return false;
+                    }
+                }
+                // 获取选中的名字
+                var list = that.navList;
+                var title = (function () {
+                    for (var i = 0; i < list.length; i++) {
+                        var list2 = list[i].children;
+                        for (var y = 0; y < list2.length; y++) {
+                            if (list2[y].url == key) {
+                                return list2[y].mc;
+                            }
+                        }
+                    }
+                })();
+                var pic = (function () {
+                    for (var i = 0; i < list.length; i++) {
+                        var list2 = list[i].children;
+                        for (var y = 0; y < list2.length; y++) {
+                            if (list2[y].url == key) {
+                                return list2[y].pic;
+                            }
+                        }
+                    }
+                })();
+                that.addTabs(key,title,pic);
+            },
+            /*个人中心下拉事件*/
+            changemm: function () {
+                this.passwordVisible = true;
+                if (typeof (this.$refs['mmform']) !== 'undefined') {
+                    this.$refs['mmform'].resetFields();
+                }
+            },
+            handleCommand: function (command) {
+                if (command == "changemm") {
+                    this.passwordVisible = true;
+                } else {
+                    this.logoutsure = true;
+                }
+            },
+            /*注销确定事件*/
+            logouttrue: function () {
+                this.logoutsure = false;
+                var that = this;
+                vehlic.ajax({
+                    type: "post",
+                    url: requesturl + "sign/loginOut",
+                    dataType: "json",
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                    },
+                    success: function (res) {
+                        if (res.code == 1) {
+                            localStorage.setItem("name", "");
+                            window.location.href = "login.html";
+                        } else {
+                            that.$message.error(res.message);
+                        }
+                    }
+                });
+            },
+            /*获取登录信息*/
+            getUseName: function () {
+                var that = this;
+                vehlic.ajax({
+                    type: "post",
+                    url: requesturl + "home/getLoginInfo",
+                    dataType: "json",
+                    data: {flag: 0},
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                    },
+                    success: function (res) {
+                        that.username = res.useName;
+                    }
+                });
+            },
+            /*获取登录信息*/
+            getinfo: function () {
+                var that = this;
+                vehlic.ajax({
+                    type: "post",
+                    url: requesturl + "home/getLoginInfo",
+                    dataType: "json",
+                    data: {flag: 1},
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                    },
+                    success: function (res) {
+                        that.info = res.data;
+                    }
+                });
+            },
+            passwordyz: function () {
+                var that = this;
+                this.$refs['mmform'].validate(function (valid) {
+                    if (valid) {
+                        if (that.mmform.password2 == that.mmform.password3) {
+                            vehlic.ajax({
+                                type: "post",
+                                url: requesturl + "sign/resetPassword",
+                                data: {
+                                    username: that.username,
+                                    oldpassowrd: that.mmform.password1,
+                                    password1: that.mmform.password2,
+                                    password2: that.mmform.password3
+                                },
+                                dataType: "json",
+                                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                    that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                                },
+                                success: function (res) {
+                                    if (res.code == 1) {
+                                        that.$message({
+                                            showClose: true,
+                                            message: '密码修改成功',
+                                            type: 'success'
+                                        });
+                                        that.passwordVisible = false;
+                                        that.mmform.password1 = '';
+                                        that.mmform.password2 = '';
+                                        that.mmform.password3 = '';
+                                        that.$refs['mmform'].resetFields();
+                                    } else {
+                                        that.$message.error(res.message);
+                                    }
+                                }
+                            });
+                        } else {
+                            that.$message.error('新密码两次输入不一致！');
+                        }
+                    } else {
+                        return false;
+                    }
+                });
+            }
+        },
+        mounted: function () {
+            var that = this;
+            that.getinfo();
+            // that.notice();
+            $.ajax({
+                type: "post",
+                url: requesturl + "sign/getMenuTreeByRole",
+                cache: false,
+                dataType: "json",
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    //that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                    //	window.location.href = "login.html";
+                },
+                success: function (res) {
+                    if (res.code == 1) {
+                        var test = window.location.href;
+                        that.navList = res.data;
+                        localStorage.setItem("url", test);
+                        that.opened = [res.data[0].url];
+                    } else if (res.code == -2) {
+                        window.location.href = "login.html";
+                    } else {
+                        that.$message.error(res.message);
+                        window.location.href = "login.html";
+                    }
+                }
+            });
+            if (localStorage.getItem("name") != null) {
+                this.username = localStorage.getItem("name");
+            }
+            this.getUseName();
+            var that = this;
+            this.timer = setInterval(function () {
+                that.date = new Date(); //修改数据date
+            }, 1000);
+        },
+        beforeDestroy: function () {
+            if (this.timer) {
+                clearInterval(this.timer);
+            }
+        },
+    })
+    /*左侧导航栏与右侧高度适应*/
+    window.onscroll = function () {
+        var t = document.body.scrollTop || document.documentElement.scrollTop;
+        if (t > 0) {
+            document.getElementById("nav").style.height = document.getElementById("content").offsetHeight + "px";
+        } else {
+            document.getElementById("nav").style.height = "100%";
+        }
+    }
+    var addTabs = function(url,name,pic){
+        indexVue.addTabs(url,name,pic);
+    }
+</script>
+
+</html>

@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.xiongdi.ocdm.mapper.dao.SysOrganizationMapper" >
+  <resultMap id="BaseResultMap" type="cn.xiongdi.ocdm.mapper.model.SysOrganization" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="dwlx" property="dwlx" jdbcType="CHAR" />
+    <result column="dwbm" property="dwbm" jdbcType="VARCHAR" />
+    <result column="dwmc" property="dwmc" jdbcType="VARCHAR" />
+    <result column="dwjb" property="dwjb" jdbcType="CHAR" />
+    <result column="xzqh" property="xzqh" jdbcType="VARCHAR" />
+    <result column="lsdw" property="lsdw" jdbcType="BIGINT" />
+    <result column="fzr" property="fzr" jdbcType="VARCHAR" />
+    <result column="sjhm" property="sjhm" jdbcType="VARCHAR" />
+    <result column="wjbsbid" property="wjbsbid" jdbcType="VARCHAR" />
+    <result column="dz" property="dz" jdbcType="VARCHAR" />
+    <result column="bz" property="bz" jdbcType="VARCHAR" />
+    <result column="scbs" property="scbs" jdbcType="CHAR" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" />
+    <result column="createuid" property="createuid" jdbcType="VARCHAR" />
+    <result column="createip" property="createip" jdbcType="CHAR" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" />
+    <result column="updateuid" property="updateuid" jdbcType="VARCHAR" />
+    <result column="updateip" property="updateip" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, dwlx, dwbm, dwmc, dwjb, xzqh, lsdw, fzr, sjhm, wjbsbid, dz, bz, scbs, createtime, 
+    createuid, createip, updatetime, updateuid, updateip
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_organization
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+
+  <!-- 获取全部ID和单位名称-->
+  <select id="selectSysOrganizationAll" resultMap="BaseResultMap" >
+    select
+    id,dwmc
+    from sys_organization where scbs = '0'
+    order by dwmc
+  </select>
+
+  <select id="getListPage" parameterType="cn.xiongdi.ocdm.mapper.model.SysOrganization" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from sys_organization
+    <where>
+      scbs = 0
+      <if test="dwmc!=null and dwmc!=''">
+        AND dwmc LIKE CONCAT('%',#{dwmc,jdbcType=VARCHAR},'%')
+      </if>
+      <if test="dwjb!=null and dwjb!=''">
+        AND dwjb =#{dwjb,jdbcType=CHAR}
+      </if>
+      <if test="lsdw!=null">
+        AND lsdw =#{lsdw,jdbcType=BIGINT}
+      </if>
+    </where>
+    order by id asc
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from sys_organization
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="cn.xiongdi.ocdm.mapper.model.SysOrganization" >
+    insert into sys_organization (id, dwlx, dwbm, dwmc, 
+      dwjb, xzqh, lsdw, fzr, 
+      sjhm, wjbsbid, dz, 
+      bz, scbs, createtime, 
+      createuid, createip, updatetime, 
+      updateuid, updateip)
+    values (#{id,jdbcType=BIGINT}, #{dwlx,jdbcType=CHAR}, #{dwbm,jdbcType=VARCHAR}, #{dwmc,jdbcType=VARCHAR}, 
+      #{dwjb,jdbcType=CHAR}, #{xzqh,jdbcType=VARCHAR}, #{lsdw,jdbcType=BIGINT}, #{fzr,jdbcType=VARCHAR}, 
+      #{sjhm,jdbcType=VARCHAR}, #{wjbsbid,jdbcType=VARCHAR}, #{dz,jdbcType=VARCHAR}, 
+      #{bz,jdbcType=VARCHAR}, #{scbs,jdbcType=CHAR}, #{createtime,jdbcType=TIMESTAMP}, 
+      #{createuid,jdbcType=VARCHAR}, #{createip,jdbcType=CHAR}, #{updatetime,jdbcType=TIMESTAMP}, 
+      #{updateuid,jdbcType=VARCHAR}, #{updateip,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="cn.xiongdi.ocdm.mapper.model.SysOrganization" >
+    insert into sys_organization
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="dwlx != null" >
+        dwlx,
+      </if>
+      <if test="dwbm != null" >
+        dwbm,
+      </if>
+      <if test="dwmc != null" >
+        dwmc,
+      </if>
+      <if test="dwjb != null" >
+        dwjb,
+      </if>
+      <if test="xzqh != null" >
+        xzqh,
+      </if>
+      <if test="lsdw != null" >
+        lsdw,
+      </if>
+      <if test="fzr != null" >
+        fzr,
+      </if>
+      <if test="sjhm != null" >
+        sjhm,
+      </if>
+      <if test="wjbsbid != null" >
+        wjbsbid,
+      </if>
+      <if test="dz != null" >
+        dz,
+      </if>
+      <if test="bz != null" >
+        bz,
+      </if>
+      <if test="scbs != null" >
+        scbs,
+      </if>
+      <if test="createtime != null" >
+        createtime,
+      </if>
+      <if test="createuid != null" >
+        createuid,
+      </if>
+      <if test="createip != null" >
+        createip,
+      </if>
+      <if test="updatetime != null" >
+        updatetime,
+      </if>
+      <if test="updateuid != null" >
+        updateuid,
+      </if>
+      <if test="updateip != null" >
+        updateip,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="dwlx != null" >
+        #{dwlx,jdbcType=CHAR},
+      </if>
+      <if test="dwbm != null" >
+        #{dwbm,jdbcType=VARCHAR},
+      </if>
+      <if test="dwmc != null" >
+        #{dwmc,jdbcType=VARCHAR},
+      </if>
+      <if test="dwjb != null" >
+        #{dwjb,jdbcType=CHAR},
+      </if>
+      <if test="xzqh != null" >
+        #{xzqh,jdbcType=VARCHAR},
+      </if>
+      <if test="lsdw != null" >
+        #{lsdw,jdbcType=BIGINT},
+      </if>
+      <if test="fzr != null" >
+        #{fzr,jdbcType=VARCHAR},
+      </if>
+      <if test="sjhm != null" >
+        #{sjhm,jdbcType=VARCHAR},
+      </if>
+      <if test="wjbsbid != null" >
+        #{wjbsbid,jdbcType=VARCHAR},
+      </if>
+      <if test="dz != null" >
+        #{dz,jdbcType=VARCHAR},
+      </if>
+      <if test="bz != null" >
+        #{bz,jdbcType=VARCHAR},
+      </if>
+      <if test="scbs != null" >
+        #{scbs,jdbcType=CHAR},
+      </if>
+      <if test="createtime != null" >
+        #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createuid != null" >
+        #{createuid,jdbcType=VARCHAR},
+      </if>
+      <if test="createip != null" >
+        #{createip,jdbcType=CHAR},
+      </if>
+      <if test="updatetime != null" >
+        #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateuid != null" >
+        #{updateuid,jdbcType=VARCHAR},
+      </if>
+      <if test="updateip != null" >
+        #{updateip,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.xiongdi.ocdm.mapper.model.SysOrganization" >
+    update sys_organization
+    <set >
+      <if test="dwlx != null" >
+        dwlx = #{dwlx,jdbcType=CHAR},
+      </if>
+      <if test="dwbm != null" >
+        dwbm = #{dwbm,jdbcType=VARCHAR},
+      </if>
+      <if test="dwmc != null" >
+        dwmc = #{dwmc,jdbcType=VARCHAR},
+      </if>
+      <if test="dwjb != null" >
+        dwjb = #{dwjb,jdbcType=CHAR},
+      </if>
+      <if test="xzqh != null" >
+        xzqh = #{xzqh,jdbcType=VARCHAR},
+      </if>
+      <if test="lsdw != null" >
+        lsdw = #{lsdw,jdbcType=BIGINT},
+      </if>
+      <if test="fzr != null" >
+        fzr = #{fzr,jdbcType=VARCHAR},
+      </if>
+      <if test="sjhm != null" >
+        sjhm = #{sjhm,jdbcType=VARCHAR},
+      </if>
+      <if test="wjbsbid != null" >
+        wjbsbid = #{wjbsbid,jdbcType=VARCHAR},
+      </if>
+      <if test="dz != null" >
+        dz = #{dz,jdbcType=VARCHAR},
+      </if>
+      <if test="bz != null" >
+        bz = #{bz,jdbcType=VARCHAR},
+      </if>
+      <if test="scbs != null" >
+        scbs = #{scbs,jdbcType=CHAR},
+      </if>
+      <if test="createtime != null" >
+        createtime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createuid != null" >
+        createuid = #{createuid,jdbcType=VARCHAR},
+      </if>
+      <if test="createip != null" >
+        createip = #{createip,jdbcType=CHAR},
+      </if>
+      <if test="updatetime != null" >
+        updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateuid != null" >
+        updateuid = #{updateuid,jdbcType=VARCHAR},
+      </if>
+      <if test="updateip != null" >
+        updateip = #{updateip,jdbcType=CHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.xiongdi.ocdm.mapper.model.SysOrganization" >
+    update sys_organization
+    set dwlx = #{dwlx,jdbcType=CHAR},
+      dwbm = #{dwbm,jdbcType=VARCHAR},
+      dwmc = #{dwmc,jdbcType=VARCHAR},
+      dwjb = #{dwjb,jdbcType=CHAR},
+      xzqh = #{xzqh,jdbcType=VARCHAR},
+      lsdw = #{lsdw,jdbcType=BIGINT},
+      fzr = #{fzr,jdbcType=VARCHAR},
+      sjhm = #{sjhm,jdbcType=VARCHAR},
+      wjbsbid = #{wjbsbid,jdbcType=VARCHAR},
+      dz = #{dz,jdbcType=VARCHAR},
+      bz = #{bz,jdbcType=VARCHAR},
+      scbs = #{scbs,jdbcType=CHAR},
+      createtime = #{createtime,jdbcType=TIMESTAMP},
+      createuid = #{createuid,jdbcType=VARCHAR},
+      createip = #{createip,jdbcType=CHAR},
+      updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      updateuid = #{updateuid,jdbcType=VARCHAR},
+      updateip = #{updateip,jdbcType=CHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="getComBoxBySsdwId" resultType="java.util.Map" parameterType="java.lang.Long"  >
+    SELECT id,dwmc,lsdw from sys_organization where scbs=0 and id &lt;&gt; 106 and
+    ((dwjb != (
+      select case dwjb
+      when '0' then '2'
+      when '2' then '0'
+      else '3' end
+      from sys_organization where id= #{id,jdbcType=BIGINT}
+    ) and dwlx!='2')or
+    (dwlx='2' and
+    (select dwjb from sys_organization where id= #{id,jdbcType=BIGINT} )='1'))
+    ORDER BY lsdw,id DESC
+  </select>
+  <select id="checkInfo" parameterType="cn.xiongdi.ocdm.mapper.model.SysOrganization" resultType="java.lang.Integer">
+    select
+    count(0)
+    from sys_organization
+    where scbs = 0
+    <if test="dwmc != null and dwmc != ''">
+      and dwmc = #{dwmc,jdbcType=VARCHAR}
+    </if>
+    <if test="dwbm != null and dwbm != ''">
+      and dwbm = #{dwbm,jdbcType=VARCHAR}
+    </if>
+    <if test="id != null">
+      and id != #{id,jdbcType=BIGINT}
+    </if>
+  </select>
+
+  <select id="getXjDw" resultType="Integer">
+    select id from sys_organization where lsdw = #{lsdw} and scbs = 0
+  </select>
+</mapper>

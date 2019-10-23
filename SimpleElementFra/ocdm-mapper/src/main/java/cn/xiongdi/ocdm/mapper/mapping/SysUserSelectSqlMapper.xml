@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.xiongdi.ocdm.mapper.dao.SysUserSelectSqlMapper" >
+  <resultMap id="BaseResultMap" type="cn.xiongdi.ocdm.mapper.model.SysUserSelectSql" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="yhm" property="yhm" jdbcType="VARCHAR" />
+    <result column="xzxm" property="xzxm" jdbcType="VARCHAR" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" />
+    <result column="createuid" property="createuid" jdbcType="VARCHAR" />
+    <result column="createip" property="createip" jdbcType="CHAR" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" />
+    <result column="updateuid" property="updateuid" jdbcType="VARCHAR" />
+    <result column="updateip" property="updateip" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, yhm, xzxm, createtime, createuid, createip, updatetime, updateuid, updateip
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_userselectsql
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="getUserSelectField" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from sys_userselectsql
+    <where>
+      <if test="yhm!=null and yhm!=''">
+      AND  yhm=#{yhm,jdbcType=VARCHAR}
+      </if>
+      <if test="yhm==null">
+        AND  yhm=''
+      </if>
+    </where>
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from sys_userselectsql
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="cn.xiongdi.ocdm.mapper.model.SysUserSelectSql" >
+    insert into sys_userselectsql (id, yhm, xzxm, 
+      createtime, createuid, createip, 
+      updatetime, updateuid, updateip
+      )
+    values (#{id,jdbcType=BIGINT}, #{yhm,jdbcType=VARCHAR}, #{xzxm,jdbcType=VARCHAR}, 
+      #{createtime,jdbcType=TIMESTAMP}, #{createuid,jdbcType=VARCHAR}, #{createip,jdbcType=CHAR}, 
+      #{updatetime,jdbcType=TIMESTAMP}, #{updateuid,jdbcType=VARCHAR}, #{updateip,jdbcType=CHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="cn.xiongdi.ocdm.mapper.model.SysUserSelectSql" >
+    insert into sys_userselectsql
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="yhm != null" >
+        yhm,
+      </if>
+      <if test="xzxm != null" >
+        xzxm,
+      </if>
+      <if test="createtime != null" >
+        createtime,
+      </if>
+      <if test="createuid != null" >
+        createuid,
+      </if>
+      <if test="createip != null" >
+        createip,
+      </if>
+      <if test="updatetime != null" >
+        updatetime,
+      </if>
+      <if test="updateuid != null" >
+        updateuid,
+      </if>
+      <if test="updateip != null" >
+        updateip,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="yhm != null" >
+        #{yhm,jdbcType=VARCHAR},
+      </if>
+      <if test="xzxm != null" >
+        #{xzxm,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null" >
+        #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createuid != null" >
+        #{createuid,jdbcType=VARCHAR},
+      </if>
+      <if test="createip != null" >
+        #{createip,jdbcType=CHAR},
+      </if>
+      <if test="updatetime != null" >
+        #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateuid != null" >
+        #{updateuid,jdbcType=VARCHAR},
+      </if>
+      <if test="updateip != null" >
+        #{updateip,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.xiongdi.ocdm.mapper.model.SysUserSelectSql" >
+    update sys_userselectsql
+    <set >
+      <if test="yhm != null" >
+        yhm = #{yhm,jdbcType=VARCHAR},
+      </if>
+      <if test="xzxm != null" >
+        xzxm = #{xzxm,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null" >
+        createtime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createuid != null" >
+        createuid = #{createuid,jdbcType=VARCHAR},
+      </if>
+      <if test="createip != null" >
+        createip = #{createip,jdbcType=CHAR},
+      </if>
+      <if test="updatetime != null" >
+        updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateuid != null" >
+        updateuid = #{updateuid,jdbcType=VARCHAR},
+      </if>
+      <if test="updateip != null" >
+        updateip = #{updateip,jdbcType=CHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.xiongdi.ocdm.mapper.model.SysUserSelectSql" >
+    update sys_userselectsql
+    set yhm = #{yhm,jdbcType=VARCHAR},
+      xzxm = #{xzxm,jdbcType=VARCHAR},
+      createtime = #{createtime,jdbcType=TIMESTAMP},
+      createuid = #{createuid,jdbcType=VARCHAR},
+      createip = #{createip,jdbcType=CHAR},
+      updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      updateuid = #{updateuid,jdbcType=VARCHAR},
+      updateip = #{updateip,jdbcType=CHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

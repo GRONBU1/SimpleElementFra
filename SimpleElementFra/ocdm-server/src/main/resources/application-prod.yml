@@ -1,0 +1,36 @@
+# ===================================================================
+# springboot标准配置
+#
+# 完整文档参考: http://
+# ===================================================================
+server:
+  port: 7788
+  session:
+    timeout: 900
+  ssl:
+    key-store: classpath:ocdm.keystore
+    key-store-password: xiongdi@2018
+    keyStoreType: JKS
+    keyAlias: ocdm
+
+spring:
+  datasource:
+      name: test
+      url: jdbc:mysql://172.18.1.15:3306/ocdm?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&failOverReadOnly=false&allowMultiQueries=true
+      username: root
+      password: seven
+      type: com.alibaba.druid.pool.DruidDataSource
+      driver-class-name: com.mysql.jdbc.Driver
+      filters: stat
+      maxActive: 20
+      initialSize: 1
+      maxWait: 60000
+      minIdle: 1
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: select 'x'
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      poolPreparedStatements: true
+      maxOpenPreparedStatements: 20

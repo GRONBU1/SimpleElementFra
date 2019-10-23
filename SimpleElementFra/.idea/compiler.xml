@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="ocdm-mapper" />
+        <module name="ocdm-web" />
+        <module name="ocdm-server" />
+        <module name="ocdm-common" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="ocdm" target="1.8" />
+      <module name="ocdm-common" target="1.8" />
+      <module name="ocdm-mapper" target="1.8" />
+      <module name="ocdm-server" target="1.8" />
+      <module name="ocdm-web" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="ocdm-common" options="-XDignore.symbol.file" />
+      <module name="ocdm-mapper" options="-XDignore.symbol.file" />
+      <module name="ocdm-server" options="-XDignore.symbol.file" />
+      <module name="ocdm-web" options="-XDignore.symbol.file" />
+    </option>
+  </component>
+</project>

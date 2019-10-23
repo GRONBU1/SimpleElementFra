@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xiongdi.ocdm.mapper.dao.SysRolePermissionMapper">
+  <resultMap id="BaseResultMap" type="cn.xiongdi.ocdm.mapper.model.SysRolePermission">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="jsid" jdbcType="BIGINT" property="jsid" />
+    <result column="menuid" jdbcType="VARCHAR" property="menuid" />
+    <result column="bz" jdbcType="VARCHAR" property="bz" />
+    <result column="qxyzm" jdbcType="VARCHAR" property="qxyzm" />
+    <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
+    <result column="createuid" jdbcType="CHAR" property="createuid" />
+    <result column="createip" jdbcType="CHAR" property="createip" />
+    <result column="updatetime" jdbcType="TIMESTAMP" property="updatetime" />
+    <result column="updateuid" jdbcType="CHAR" property="updateuid" />
+    <result column="updateip" jdbcType="CHAR" property="updateip" />
+    <result column="sjcdid" jdbcType="BIGINT" property="sjcdid" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, jsid, menuid, bz, qxyzm, createtime, createuid, createip, updatetime, updateuid, 
+    updateip
+  </sql>
+
+
+  <!--插入角色权限-->
+  <delete id="insertPermission" parameterType="java.util.List">
+    insert into sys_rolepermission (id, jsid, menuid,
+    bz, qxyzm, createtime,
+    createuid, createip, updatetime,
+    updateuid, updateip)
+    values
+    <foreach collection="list" index="index" item="item"  separator="," >
+      ( #{item.id,jdbcType=BIGINT}, #{item.jsid,jdbcType=BIGINT}, #{item.menuid,jdbcType=BIGINT},
+      #{item.bz,jdbcType=VARCHAR}, #{item.qxyzm,jdbcType=VARCHAR}, #{item.createtime,jdbcType=TIMESTAMP},
+      #{item.createuid,jdbcType=CHAR}, #{item.createip,jdbcType=CHAR}, #{item.updatetime,jdbcType=TIMESTAMP},
+      #{item.updateuid,jdbcType=CHAR}, #{item.updateip,jdbcType=CHAR})
+    </foreach>
+  </delete>
+
+  <!--根据角色ID删除权限信息-->
+  <delete id="deletePermissionByRoleId">
+    DELETE FROM sys_rolepermission
+    WHERE jsid = #{jsid,jdbcType=BIGINT}
+  </delete>
+
+  <!--根据角色ID获取权限信息-->
+    <select id="selectPermissionByRoleId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM
+    sys_rolepermission
+    WHERE jsid = #{jsid,jdbcType=BIGINT}
+  </select>
+
+    <!-- 根据角色ID查询菜单权限ID-->
+    <select id="selectMenuidByRoleId" parameterType="java.lang.Long" resultType="java.lang.Long">
+    SELECT
+    menuid
+    FROM
+    sys_rolepermission
+    WHERE jsid = #{jsid,jdbcType=BIGINT}
+  </select>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_rolepermission
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from sys_rolepermission
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="cn.xiongdi.ocdm.mapper.model.SysRolePermission">
+    insert into sys_rolepermission (id, jsid, menuid, 
+      bz, qxyzm, createtime, 
+      createuid, createip, updatetime, 
+      updateuid, updateip)
+    values (#{id,jdbcType=BIGINT}, #{jsid,jdbcType=BIGINT}, #{menuid,jdbcType=VARCHAR}, 
+      #{bz,jdbcType=VARCHAR}, #{qxyzm,jdbcType=VARCHAR}, #{createtime,jdbcType=TIMESTAMP}, 
+      #{createuid,jdbcType=CHAR}, #{createip,jdbcType=CHAR}, #{updatetime,jdbcType=TIMESTAMP}, 
+      #{updateuid,jdbcType=CHAR}, #{updateip,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="cn.xiongdi.ocdm.mapper.model.SysRolePermission">
+    insert into sys_rolepermission
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="jsid != null">
+        jsid,
+      </if>
+      <if test="menuid != null">
+        menuid,
+      </if>
+      <if test="bz != null">
+        bz,
+      </if>
+      <if test="qxyzm != null">
+        qxyzm,
+      </if>
+      <if test="createtime != null">
+        createtime,
+      </if>
+      <if test="createuid != null">
+        createuid,
+      </if>
+      <if test="createip != null">
+        createip,
+      </if>
+      <if test="updatetime != null">
+        updatetime,
+      </if>
+      <if test="updateuid != null">
+        updateuid,
+      </if>
+      <if test="updateip != null">
+        updateip,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="jsid != null">
+        #{jsid,jdbcType=BIGINT},
+      </if>
+      <if test="menuid != null">
+        #{menuid,jdbcType=VARCHAR},
+      </if>
+      <if test="bz != null">
+        #{bz,jdbcType=VARCHAR},
+      </if>
+      <if test="qxyzm != null">
+        #{qxyzm,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null">
+        #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createuid != null">
+        #{createuid,jdbcType=CHAR},
+      </if>
+      <if test="createip != null">
+        #{createip,jdbcType=CHAR},
+      </if>
+      <if test="updatetime != null">
+        #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateuid != null">
+        #{updateuid,jdbcType=CHAR},
+      </if>
+      <if test="updateip != null">
+        #{updateip,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.xiongdi.ocdm.mapper.model.SysRolePermission">
+    update sys_rolepermission
+    <set>
+      <if test="jsid != null">
+        jsid = #{jsid,jdbcType=BIGINT},
+      </if>
+      <if test="menuid != null">
+        menuid = #{menuid,jdbcType=VARCHAR},
+      </if>
+      <if test="bz != null">
+        bz = #{bz,jdbcType=VARCHAR},
+      </if>
+      <if test="qxyzm != null">
+        qxyzm = #{qxyzm,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null">
+        createtime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createuid != null">
+        createuid = #{createuid,jdbcType=CHAR},
+      </if>
+      <if test="createip != null">
+        createip = #{createip,jdbcType=CHAR},
+      </if>
+      <if test="updatetime != null">
+        updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateuid != null">
+        updateuid = #{updateuid,jdbcType=CHAR},
+      </if>
+      <if test="updateip != null">
+        updateip = #{updateip,jdbcType=CHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.xiongdi.ocdm.mapper.model.SysRolePermission">
+    update sys_rolepermission
+    set jsid = #{jsid,jdbcType=BIGINT},
+      menuid = #{menuid,jdbcType=VARCHAR},
+      bz = #{bz,jdbcType=VARCHAR},
+      qxyzm = #{qxyzm,jdbcType=VARCHAR},
+      createtime = #{createtime,jdbcType=TIMESTAMP},
+      createuid = #{createuid,jdbcType=CHAR},
+      createip = #{createip,jdbcType=CHAR},
+      updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      updateuid = #{updateuid,jdbcType=CHAR},
+      updateip = #{updateip,jdbcType=CHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

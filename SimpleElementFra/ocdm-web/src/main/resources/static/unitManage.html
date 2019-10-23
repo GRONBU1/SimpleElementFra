@@ -1,0 +1,690 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="x-ua-compatible" content="IE=Edge">
+    <title>系统管理-单位管理</title>
+    <link rel="shortcut icon" href="img/icon.ico"/>
+    <link rel="stylesheet" href="elementui/index.css">
+    <link rel="stylesheet" href="css/style.css"/>
+    <style>
+        .ms-tree-space {
+            display: inline-block;
+            font-style: normal;
+            font-weight: 400;
+            height: 14px;
+            line-height: 1;
+            position: relative;
+            top: 1px;
+            width: 18px;
+        }
+    </style>
+</head>
+
+<body>
+<div id="app" class="heiall bigcont" v-cloak>
+    <div class="content clearfloat">
+        <div class="contright" id="content">
+            <div class="contrighton">
+                <div class="contentdiv2">
+                    <div class="fl search-list">
+                        <img src="../img/cxjg.png" alt="" class="search-list" >查询结果
+                    </div>
+                    <div class="fr marbtm20">
+                        <el-button type="primary" icon="el-icon-circle-plus" @click="add">新增单位</el-button>
+                    </div>
+                    <div class="marbtm20">
+                        <el-table :data="formatData" stripe border :row-style="showRow" v-bind="$attrs">
+                            <el-table-column label="序号" type="index" width="60">
+                            </el-table-column>
+                            <el-table-column v-if="columns.length===0" width="150">
+                                <template slot-scope="scope">
+                                    <span v-for="space in scope.row._level" :key="space" class="ms-tree-space"></span>
+                                    <span v-if="iconShow(0,scope.row)" class="tree-ctrl"
+                                          @click="toggleExpanded(scope.$index)">
+                                                <i v-if="!scope.row._expanded" class="el-icon-plus"></i>
+                                                <i v-else class="el-icon-minus"></i>
+                                            </span>
+                                    {{ scope.$index }}
+                                </template>
+                            </el-table-column>
+                            <el-table-column v-for="(column, index) in columns" v-else :key="column.value"
+                                             :label="column.text" :width="column.width" show-overflow-tooltip>
+                                <template slot-scope="scope">
+                                    <!-- Todo -->
+                                    <span v-for="space in scope.row._level" v-if="index === 0" :key="space"
+                                          class="ms-tree-space"></span>
+                                    <span v-if="iconShow(index,scope.row)" class="tree-ctrl"
+                                          @click="toggleExpanded(scope.$index)">
+                                                <i v-if="!scope.row._expanded" class="el-icon-plus"></i>
+                                                <i v-else class="el-icon-minus"></i>
+                                            </span>
+                                    {{ scope.row[column.value] }}
+                                </template>
+                            </el-table-column>
+                            <el-table-column fixed="right" label="操作" width="185" align="center">
+                                <template slot-scope="scope">
+                                    <el-button @click="editinfo(scope.row)" type="primary" icon="el-icon-edit" size="small">编辑</el-button>
+                                    <el-button @click="delinfo(scope.row)" type="danger" icon="el-icon-delete" size="small">删除</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+
+                </div>
+
+                <el-dialog :title="addTitle" :visible.sync="dialogAdd" width="700px">
+                    <el-form ref="addForm" :model="addForm" :rules="addRules"
+                             label-width="110px">
+                        <el-row>
+                            <el-col :span="12">
+                                <el-form-item label="单位类型" prop="dwlx">
+                                    <el-select v-model="addForm.dwlx" placeholder="请选择单位类型" @change="selectUnitTypeAdd"
+                                               clearable>
+                                        <el-option v-for="(item, index) in unitTypes" :key="index" :label="item.name"
+                                                   :value="item.value">
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item label="隶属单位" prop="lsdw">
+                                    <el-select v-model="addForm.lsdw" placeholder="请选择单位" style="width:100%"
+                                               :disabled="unitDisabledAdd">
+                                        <el-option v-for="(item, id) in units" :key="id" :label="item.dwmc"
+                                                   :value="item.id">
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+
+                        <el-row>
+                            <el-col :span="12">
+                                <el-form-item label="单位名称" prop="dwmc">
+                                    <el-input @keyup.enter.native="addSubmit('addForm')" clearable
+                                              v-model.trim="addForm.dwmc"></el-input>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item label="单位编码" prop="dwbm">
+                                    <el-input @keyup.enter.native="addSubmit('addForm')" clearable
+                                              v-model.trim="addForm.dwbm"></el-input>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+
+                        <el-row>
+                            <el-col :span="12">
+                                <el-form-item label="负责人" prop="fzr">
+                                    <el-input @keyup.enter.native="addSubmit('addForm')" clearable
+                                              v-model.trim="addForm.fzr"></el-input>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item label="手机号码" prop="sjhm">
+                                    <el-input @keyup.enter.native="addSubmit('addForm')" clearable
+                                              v-model.trim="addForm.sjhm"></el-input>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-form-item label="行政区划" prop="workarea">
+                            <el-cascader
+                                    :options="options"
+                                    change-on-select
+                                    v-model="addForm.workarea"
+                                    @change="handleChange"
+                                    style="width:100%">
+                            </el-cascader>
+                        </el-form-item>
+                        <el-form-item label="外交部上报ID" prop="wjbsbid">
+                            <el-input @keyup.enter.native="addSubmit('addForm')" clearable
+                                      v-model.trim="addForm.wjbsbid"></el-input>
+                        </el-form-item>
+                        <el-form-item label="地址" prop="dz">
+                            <el-input @keyup.enter.native="addSubmit('addForm')" clearable
+                                      v-model.trim="addForm.dz"></el-input>
+                        </el-form-item>
+                        <el-form-item label="备注" prop="bz">
+                            <el-input type="textarea" :rows="2" clearable v-model.trim="addForm.bz"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <span slot="footer" class="dialog-footer">
+                            <el-button @click="dialogAdd=false">取 消</el-button>
+                            <el-button type="primary" @click="addSubmit('addForm')">确 定</el-button>
+                        </span>
+                </el-dialog>
+
+                <el-dialog :title="editTitle" :visible.sync="dialogEdit" width="700px">
+                    <el-form ref="editForm" :model="editForm" :rules="addRules"
+                             label-width="110px">
+                        <el-row>
+                            <el-col :span="12">
+                                <el-form-item label="单位类型" prop="dwlx">
+                                    <el-select v-model="editForm.dwlx" placeholder="请选择单位类型" disabled>
+                                        <el-option v-for="(item, index) in unitTypes" :key="index" :label="item.name"
+                                                   :value="item.value">
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item label="隶属单位">
+                                    <el-select v-if="showLsdw" v-model="editForm.lsdw" placeholder="请选择单位" style="width:100%"
+                                               disabled>
+                                        <el-option v-for="(item, id) in units" :key="id" :label="item.dwmc"
+                                                   :value="item.id">
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+
+                        <el-row>
+                            <el-col :span="12">
+                                <el-form-item label="单位名称" prop="dwmc">
+                                    <el-input @keyup.enter.native="editSubmit('editForm')" clearable
+                                              v-model.trim="editForm.dwmc"></el-input>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item label="单位编码" prop="dwbm">
+                                    <el-input @keyup.enter.native="editSubmit('editForm')" disabled
+                                              v-model.trim="editForm.dwbm"></el-input>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+
+                        <el-row>
+                            <el-col :span="12">
+                                <el-form-item label="负责人" prop="fzr">
+                                    <el-input @keyup.enter.native="editSubmit('editForm')" clearable
+                                              v-model.trim="editForm.fzr"></el-input>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item label="手机号码" prop="sjhm">
+                                    <el-input @keyup.enter.native="editSubmit('editForm')" clearable
+                                              v-model.trim="editForm.sjhm"></el-input>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-form-item label="行政区划" prop="workarea">
+                            <el-cascader
+                                    :options="options"
+                                    change-on-select
+                                    v-model="editForm.workarea"
+                                    style="width:100%">
+                            </el-cascader>
+                        </el-form-item>
+
+                        <el-form-item label="外交部上报ID" prop="wjbsbid">
+                            <el-input @keyup.enter.native="editSubmit('editForm')" clearable
+                                      v-model.trim="editForm.wjbsbid"></el-input>
+                        </el-form-item>
+                        <el-form-item label="地址" prop="dz">
+                            <el-input @keyup.enter.native="editSubmit('editForm')" clearable
+                                      v-model.trim="editForm.dz"></el-input>
+                        </el-form-item>
+                        <el-form-item label="备注" prop="bz">
+                            <el-input type="textarea" :rows="2" clearable v-model.trim="editForm.bz"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <span slot="footer" class="dialog-footer">
+                            <el-button @click="dialogEdit=false">取 消</el-button>
+                            <el-button type="primary" @click="editSubmit('editForm')">确 定</el-button>
+                        </span>
+                </el-dialog>
+                <el-dialog title="提示" :visible.sync="deleteShow" width="400px" top="30vh">
+                    <p>确定删除吗？</p>
+                    <span slot="footer" class="dialog-footer">
+                            <el-button @click="deleteShow = false">取 消</el-button>
+                            <el-button type="primary" @click="deltrue">确 定</el-button>
+                        </span>
+                </el-dialog>
+
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="elementui/index.js"></script>
+<script src="js/common.js"></script>
+<script>
+    var treeToArray = function (data, expandAll, parent = null, level = null) {
+        let tmp = []
+        Array.from(data).forEach(function (record) {
+            if (record._expanded === undefined) {
+                Vue.set(record, '_expanded', expandAll)
+            }
+            let _level = 1
+            if (level !== undefined && level !== null) {
+                _level = level + 1
+            }
+            Vue.set(record, '_level', _level)
+            // 如果有父元素
+            if (parent) {
+                Vue.set(record, 'parent', parent)
+            }
+            tmp.push(record)
+            if (record.children && record.children.length > 0) {
+                const children = treeToArray(record.children, expandAll, record, _level)
+                tmp = tmp.concat(children)
+            }
+        });
+        return tmp
+    };
+    new Vue({
+        el: '#app',
+        data: {
+            options: [],
+            columns: [{
+                value: 'dwmc',
+                text: '单位名称',
+                width: '300px',
+            }, {
+                value: 'dwbm',
+                text: '单位编码',
+                width: '120px',
+            }, {
+                value: 'fzr',
+                text: '负责人',
+                width: '120px',
+            }, {
+                value: 'sjhm',
+                text: '手机号码',
+                width: '120px',
+            }, {
+                value: 'bz',
+                text: '备注',
+            }
+            ],
+            evalArgs: '',
+            expandAll: false,
+            searchinfo: {
+                name: '',
+                unit: ''
+            },
+            unitTypes: [{name: '上级部门', value: "0"}
+                , {name: '下级部门', value: "1"}
+                , {name: '外部单位', value: "2"}],
+            units: [],
+            tabledata: [],
+            unitDisabledAdd: false,
+            dialogAdd: false,
+            addTitle: '新增',
+            addForm: {
+                dwlx: null,
+                dwmc: '',
+                sjhm: '',
+                fzr: '',
+                lsdw: null,
+                workarea: [],
+                workareaStr: '',
+            },
+            checkLsdw: function (rule, value, callback) {
+                if (this.addForm.dwlx && value === '') {
+                    callback(new Error('请输入提现金额'));
+                } else {
+                    callback();
+                }
+            },
+            showLsdw: true,
+            addRules: {
+                dwlx: [{
+                    required: true,
+                    message: '单位类型不能为空',
+                    trigger: 'change'
+                }],
+                lsdw: [{
+                    required: false,
+                    message: '隶属单位不能为空',
+                    trigger: 'change'
+                }],
+                dwmc: [{
+                    required: true,
+                    message: '单位名称不能为空',
+                    trigger: 'blur'
+                }, {min: 1, max: 100, message: '长度在 1 到 100 个字符', trigger: 'blur'}],
+                dwbm: [{
+                    required: true,
+                    message: '单位编码不能为空',
+                    trigger: 'blur'
+                }, {min: 1, max: 10, message: '长度在 1 到 10 个字符', trigger: 'blur'}, {
+                    pattern: /^[A-Za-z0-9]+$/,
+                    message: '请输入数字和字母',
+                    trigger: 'blur'
+                }],
+                fzr: [{
+                    required: true,
+                    message: '负责人不能为空',
+                    trigger: 'blur'
+                }, {min: 1, max: 32, message: '长度在 1 到 32 个字符', trigger: 'blur'}],
+                sjhm: [{
+                    required: true,
+                    message: '手机号码不能为空',
+                    trigger: 'blur'
+                }, {
+                    pattern: /^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(17([0-9]))|(18[0-9]))\d{8}$|^0\d{2,3}-?\d{7,8}$/,
+                    message: '手机号码格式不正确',
+                    trigger: 'blur'
+                }, {min: 1, max: 11, message: '长度在 1 到 11 个字符', trigger: 'blur'}],
+                workarea: [{
+                    required: true,
+                    message: '行政区划不能为空',
+                    trigger: 'change'
+                }],
+                wjbsbid: [{min: 0, max: 64, message: '长度在 0 到 64 个字符', trigger: 'blur'}],
+                dz: [{min: 0, max: 256, message: '长度在 0 到 256 个字符', trigger: 'blur'}],
+                bz: [{min: 0, max: 256, message: '长度在 0 到 256 个字符', trigger: 'blur'}],
+            },
+            editTitle: '编辑',
+            dialogEdit: false,
+            editForm: {
+                dwlx: null,
+                dwmc: '',
+                sjhm: '',
+                fzr: '',
+                lsdw: null,
+                workarea: [],
+                workareaStr: '',
+            },
+            deleteShow: false,
+            deleteId: 0,
+        },
+        computed: {
+            // 格式化数据源
+            formatData: function () {
+                let tmp;
+                if (!Array.isArray(this.tabledata)) {
+                    tmp = [this.tabledata]
+                } else {
+                    tmp = this.tabledata
+                }
+                const func = this.evalFunc || treeToArray
+                const args = this.evalArgs ? Array.concat([tmp, this.expandAll], this.evalArgs) : [tmp, this.expandAll]
+
+                return func.apply(null, args)
+            }
+        },
+        methods: {
+            handleChange: function (value) {
+            },
+            showRow: function (row) {
+                const show = (row.row.parent ? (row.row.parent._expanded && row.row.parent._show) : true)
+                row.row._show = show
+                return show ? 'animation:treeTableShow 1s;-webkit-animation:treeTableShow 1s;' : 'display:none;'
+            },
+            // 切换下级是否展开
+            toggleExpanded: function (trIndex) {
+                const record = this.formatData[trIndex]
+                record._expanded = !record._expanded
+            },
+            // 图标显示
+            iconShow: function (index, record) {
+                return (index === 0 && record.children && record.children.length > 0)
+            },
+            dosearch: function () {
+                this.getinfo();
+            },
+            /*获取数据*/
+            getinfo: function () {
+                var that = this;
+                vehlic.ajax({
+                    type: "post",
+                    url: requesturl + "unitManage/getListPage",
+                    data: {
+                        orderColName: that.orderprop,
+                        order: that.order,
+                        dwmc: that.searchinfo.dwmc
+                    },
+                    dataType: "json",
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                    },
+                    success: function (res) {
+                        if (res.code == 1) {
+                            that.tabledata = res.data;
+                        } else {
+                            that.$message.error(res.message);
+                        }
+                    }
+                });
+            },
+            /*查询全部单位*/
+            getListAll: function () {
+                var that = this;
+                vehlic.ajax({
+                    type: "post",
+                    url: requesturl + "unitManage/getListAll",
+                    data: {},
+                    dataType: "json",
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                    },
+                    success: function (res) {
+                        if (res.code == 1) {
+                            that.units = res.data;
+                        } else {
+                            that.$message.error(res.message);
+                        }
+                    }
+                });
+            },
+            /*查询行政区划*/
+            getListAream: function () {
+                var that = this;
+                vehlic.ajax({
+                    type: "post",
+                    url: requesturl + "unitManage/getListAream",
+                    data: {},
+                    dataType: "json",
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                    },
+                    success: function (res) {
+                        if (res.code == 1) {
+                            that.options = res.data;
+                        } else {
+                            that.$message.error(res.message);
+                        }
+                    }
+                });
+            },
+            //新增单位类型选中事件
+            selectUnitTypeAdd: function (val) {
+                    this.showLsdw = false;
+                    this.addForm.lsdw = null;
+                if (val == 0 || val == 2) {
+                    this.addRules.lsdw[0].required = false;
+                    this.showLsdw = true;
+                    this.unitDisabledAdd = true;
+                } else {
+                    this.addRules.lsdw[0].required = true;
+                    this.showLsdw = true;
+                    this.unitDisabledAdd = false;
+                }
+            },
+            /*新增按钮点击弹出框事件*/
+            add: function () {
+                this.dialogAdd = true;
+                if (typeof (this.$refs['addForm']) !== 'undefined') {
+                    this.$refs['addForm'].resetFields();
+                }
+                for (var i in this.addForm) {
+                    this.addForm[i] = '';
+                }
+                this.addForm.workarea = [];
+                this.getListAll();
+            },
+            /*新增弹出框确定事件*/
+            addSubmit: function (formName) {
+                var that = this;
+                if (cantAjaxAgain()) {
+                    return;
+                }
+                this.$refs[formName].validate(function (valid) {
+                    if (valid) {
+                        that.addForm.workareaStr = JSON.stringify(that.addForm.workarea);
+                        vehlic.ajax({
+                            type: "post",
+                            url: requesturl + "unitManage/save",
+                            data: that.addForm,
+                            dataType: "json",
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                            },
+                            success: function (res) {
+                                if (res.code == 1) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: res.message,
+                                        type: 'success'
+                                    });
+                                    that.dialogAdd = false;
+                                    that.getinfo();
+                                } else {
+                                    that.$message.error(res.message);
+                                }
+                            }
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            /*编辑弹出框事件*/
+            editinfo: function (row) {
+                var that = this;
+                that.dialogEdit = true;
+                if (typeof (this.$refs['editForm']) !== 'undefined') {
+                    this.$refs['editForm'].resetFields();
+                }
+                this.editForm.workarea = [];
+                that.getListAll();
+                vehlic.ajax({
+                    type: "post",
+                    url: requesturl + "unitManage/selectByPrimaryKey",
+                    data: {id: row.id},
+                    dataType: "json",
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                    },
+                    success: function (res) {
+                        if (res.code == 1) {
+                            that.editForm = res.data;
+                            that.editForm.workarea = res.temp_data;
+                            if (that.editForm.lsdw == 0) {
+                                that.editForm.lsdw = null;
+                            }
+                            that.editForm.createtime = that.convertDateFromString(that.editForm.createtime);
+                            that.editForm.updatetime = that.convertDateFromString(that.editForm.updatetime);
+                        } else {
+                            that.$message.error(res.message);
+                        }
+                    }
+                });
+
+
+            },
+            /*编辑弹出框确定事件*/
+            editSubmit: function (formName) {
+                var that = this;
+                if (cantAjaxAgain()) {
+                    return;
+                }
+                this.$refs[formName].validate(function (valid) {
+                    if (valid) {
+                        that.editForm.workareaStr = JSON.stringify(that.editForm.workarea);
+                        vehlic.ajax({
+                            type: "post",
+                            url: requesturl + "unitManage/save",
+                            data: that.editForm,
+                            dataType: "json",
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                            },
+                            success: function (res) {
+                                if (res.code == 1) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '修改成功',
+                                        type: 'success'
+                                    });
+                                    that.dialogEdit = false;
+                                    that.getinfo();
+                                } else {
+                                    that.$message.error(res.message);
+                                }
+                            }
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            /*删除按钮点击弹出框事件*/
+            delinfo: function (row) {
+                this.deleteShow = true;
+                this.deleteId = row.id;
+            },
+            /*删除弹出框确认事件*/
+            deltrue: function () {
+                this.deleteShow = false;
+                var that = this;
+                if (cantAjaxAgain()) {
+                    return;
+                }
+                vehlic.ajax({
+                    type: "post",
+                    url: requesturl + "unitManage/delete",
+                    data: {
+                        id: that.deleteId
+                    },
+                    dataType: "json",
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                    },
+                    success: function (res) {
+                        if (res.code == 1) {
+                            that.$message({
+                                showClose: true,
+                                message: '删除成功',
+                                type: 'success'
+                            });
+                            that.getinfo();
+                        } else {
+                            that.$message.error(res.message);
+                        }
+                    }
+                });
+            },
+            /*日期字符串转date类型方法*/
+            convertDateFromString: function (dateString) {
+                if (dateString) {
+                    var d = new Date(Date.parse(dateString.replace(/-/g, "/")));
+                    return d;
+                }
+            },
+
+        },
+        mounted: function () {
+            this.getinfo();
+            this.getListAream();
+
+        },
+        watch: {
+            // 初期选择
+            formatData: function () {
+                this.$nextTick(function () {
+                    this.toggleExpanded(0);
+                })
+            }
+        },
+    })
+</script>
+
+</html>

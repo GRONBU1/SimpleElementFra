@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="x-ua-compatible" content="IE=Edge">
+    <title>主页</title>
+    <link rel="shortcut icon" href="img/cookie.png"/>
+    <link rel="stylesheet" href="elementui/index.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css"/>
+</head>
+
+<body class="home-body">
+<div id="app" class="heiall bigcont" v-cloak>
+    <div class="content clearfloat">
+        <div class="contright" id="content">
+            <div class="contrighton">
+                <el-row :gutter="20">
+                    <el-col :span="13">
+                        <div class="userinfop">
+                            <el-card class="box-card marbtm20">
+                                <h3><img src="../img/yhzt.png" alt="" style="vertical-align: -5px;"> 用户状态</h3>
+                                <el-row>
+                                    <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+                                        <span class="index-uerstatus">当前用户状态：</span>
+                                        <span class="color-blue">{{convertzt(info.yhzt)}}</span>
+                                    </el-col>
+                                    <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+                                        <span class="index-uerstatus">当前登录IP：</span>
+                                        <span>{{info.dlip}}</span>
+                                    </el-col>
+                                    <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+                                        <span class="index-uerstatus">当前登录时间：</span>
+                                        <span>{{info.scdlsj}}</span>
+                                    </el-col>
+                                    <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+                                        <span class="index-uerstatus">上次登录时间：</span>
+                                        <span>{{info.his_dlsj}}</span>
+                                    </el-col>
+                                    <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+                                        <span class="index-uerstatus">上次用户状态：</span>
+                                        <span class="color-blue">{{convertzt(info.bz2)}}</span>
+                                    </el-col>
+                                    <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+                                        <span class="index-uerstatus">上次登录IP：</span>
+                                        <span>{{info.his_dlip}}</span>
+                                    </el-col>
+                                </el-row>
+                            </el-card>
+                        </div>
+                    </el-col>
+                    <el-col :span="11">
+                        <div class="userinfop">
+                        <el-card class="box-card marbtm20">
+                            <div>
+                                <div class="clearfloat">
+                                    <h3 class="fl"><img src="../img/yhxx.png" alt="" style="vertical-align: -5px;"> 用户信息</h3>
+                                    <a @click="moreuser" class="my-t-more fr">更多</a>
+                                </div>
+                            </div>
+                            <el-row :gutter="24">
+                                <el-row class="userdiv">
+                                    <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+                                        <span class="index-uerstatus2">用户名：</span>
+                                        <span class="color-blue">{{info.yhm}}</span>
+                                    </el-col>
+                                    <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+                                        <span class="index-uerstatus2">姓名：</span>
+                                        <span>{{info.xm}}</span>
+                                    </el-col>
+                                    <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+                                        <span class="index-uerstatus2">性别：</span>
+                                        <span>{{info.xb=='1'?'男':'女'}}</span>
+                                    </el-col>
+                                    <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+                                        <span class="index-uerstatus2">联系电话：</span>
+                                        <span>{{info.lxdh}}</span>
+                                    </el-col>
+                                    <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+                                        <span class="index-uerstatus2">手机号码：</span>
+                                        <span>{{info.sjhm}}</span>
+                                    </el-col>
+                                    <el-col :xs="12" :sm="12" :md="12" :lg="12" :xl="12">
+                                        <span class="index-uerstatus2">邮箱：</span>
+                                        <span>{{info.email}}</span>
+                                    </el-col>
+                                </el-row>
+                            </el-row>
+                        </el-card>
+                        </div>
+                    </el-col>
+                </el-row>
+            </div>
+            <el-dialog title="更多" :visible.sync="detailsure" width="400px">
+                <p>{{detailbz}}</p>
+                <span slot="footer" class="dialog-footer">
+                        <el-button type="primary" @click="detailsure = false">确 定</el-button>
+                    </span>
+            </el-dialog>
+            <el-dialog title="更多" :visible.sync="moreusersure" width="400px">
+                <p class="marbtm20">创建时间：{{info.createtime}}</p>
+                <p class="marbtm20">更新时间：{{info.updatetime}}</p>
+                <p class="marbtm20">登录终端IP：{{info.dlip}}</p>
+                <span slot="footer" class="dialog-footer">
+                        <el-button type="primary" @click="moreusersure = false">确 定</el-button>
+                    </span>
+            </el-dialog>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="elementui/index.js"></script>
+<script src="js/common.js"></script>
+<script>
+    var pageUrl = location.href.split("?")[0].split("/").pop();
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                hzNum:{
+                    zs:'',
+                    yx:'',
+                    ys:''
+                },
+                info: {},
+                detailbz: '',
+                dzqmimg: '',
+                detailsure: false,
+                moreusersure: false,
+                addrules: {
+                    lxdh: [
+                        {required: true, message: '联系电话不能为空', trigger: 'blur'},
+                        {
+                            pattern: /^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(17([0-9]))|(18[0-9]))\d{8}$|^0\d{2,3}-?\d{7,8}$/,
+                            message: '电话号码或手机号码格式不正确',
+                            trigger: 'blur'
+                        }
+                    ]
+                },
+                spannum: 18
+            }
+        },
+        methods: {
+
+            /*获取登录信息*/
+            getinfo: function () {
+                var that = this;
+                vehlic.ajax({
+                    type: "post",
+                    url: requesturl + "home/getLoginInfo",
+                    dataType: "json",
+                    data: {flag: 1},
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                    },
+                    success: function (res) {
+                        that.info = res.data;
+                        // that.showDiv();
+                    }
+                });
+            },
+            // //打开借出
+            // jcclick:function(){
+            //     parent.addTabs('infoQuery.html????1???1','证件管理','iconfont-zjgl');
+            // },
+            /*点击更多按钮事件*/
+            moreuser: function () {
+                this.moreusersure = true;
+            },
+            /*根据权限显示图标*/
+            // showDiv:function(){
+            //     var that=this;
+            //     if(that.info.zjglqx=='1'){
+            //         document.getElementById("jc").style.display="block";
+            //         document.getElementById("zk").style.display="block";
+            //     }else if(that.info.zjglqx=='0'){
+            //         document.getElementById("jc").style.display="none";
+            //         document.getElementById("zk").style.display="none";
+            //     }
+            // },
+            /*用户状态数字转具体名称*/
+            convertzt: function (zt) {
+                if (zt == '0') {
+                    return '禁用';
+                } else if (zt == '1') {
+                    return '正常';
+                } else if (zt == '2') {
+                    return '登录失败锁定';
+                } else if (zt == '3') {
+                    return '用户失效';
+                } else if (zt == '4') {
+                    return '密码失效';
+                } else if (zt == '5') {
+                    return '信息篡改';
+                } else if (zt == '6') {
+                    return '初次登录修改密码';
+                } else if (zt == '7') {
+                    return '已解锁修改密码';
+                } else if (zt == '8') {
+                    return '其他';
+                } else if (zt == '9') {
+                    return '人工锁定';
+                }
+            },
+        },
+        mounted: function () {
+            this.getinfo();
+        }
+    })
+</script>
+
+</html>

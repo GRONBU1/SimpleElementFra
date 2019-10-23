@@ -1,0 +1,335 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="x-ua-compatible" content="IE=Edge">
+    <title>系统管理-角色管理</title>
+    <link rel="shortcut icon" href="img/icon.ico"/>
+    <link rel="stylesheet" href="elementui/index.css">
+    <link rel="stylesheet" href="css/style.css"/>
+</head>
+
+<body>
+<div id="app" class="heiall bigcont" v-cloak>
+    <div id="headerwarp"></div>
+    <div class="content clearfloat">
+        <div id="navwarp" v-show="!isfold"></div>
+        <div class="contright" id="content" :class="{'contrtpad':!isfold,'contrtpadno':isfold}">
+            <div class="contrighton">
+                <div class="contentdiv2">
+                    <div class="fl search-list">
+                        <img src="../img/cxjg.png" alt="" class="search-list" >查询结果
+                    </div>
+                    <div class="fr marbtm20">
+                        <el-button type="primary" icon="el-icon-circle-plus" @click="add">新增角色</el-button>
+                    </div>
+                    <div class="marbtm20">
+                        <template>
+                            <el-table :data="tabledata" stripe border style="width: 100%">
+                                <el-table-column label="序号" type="index" width="60">
+                                    <template scope="scope"><span>{{scope.$index+(currentPage - 1) * pagesize + 1}}
+                                            </span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column prop="mc" label="角色名称" width="220" show-overflow-tooltip>
+                                </el-table-column>
+                                <el-table-column prop="bz" label="角色描述" show-overflow-tooltip>
+                                </el-table-column>
+                                <el-table-column prop="createtime" label="创建时间" show-overflow-tooltip>
+                                </el-table-column>
+                                <el-table-column fixed="right" label="操作" width="200" align="center">
+                                    <template slot-scope="scope">
+                                        <el-button @click="editinfo(scope.row)" icon="el-icon-edit" type="primary" icon="el-icon-edit" size="small">编辑</el-button>
+                                        <el-button @click="delinfo(scope.row)" type="danger" icon="el-icon-delete" size="small">删除</el-button>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </template>
+                    </div>
+                    <div class="saveck">
+                        <div class="block">
+                            <el-pagination background @size-change="sizechange" @current-change="currentchange"
+                                           :current-page="currentPage" :page-sizes="pagesizes" :page-size="pagesize"
+                                           layout="total, sizes, prev, pager, next, jumper"
+                                           :total="counts">
+                            </el-pagination>
+                        </div>
+                    </div>
+                </div>
+
+                <el-dialog :title="addTitle" :visible.sync="dialogAdd" width="400px">
+                    <el-form @keyup.enter.native="addSubmit('addForm')" ref="addForm" :model="addForm" :rules="addRules"
+                             label-width="100px">
+                        <el-form-item label="角色名称" prop="mc">
+                            <el-input clearable v-model.trim="addForm.mc"></el-input>
+                        </el-form-item>
+                        <el-form-item label="角色描述" prop="bz">
+                            <el-input clearable v-model.trim="addForm.bz"></el-input>
+                        </el-form-item>
+
+                    </el-form>
+                    <span slot="footer" class="dialog-footer">
+                            <el-button @click="dialogAdd=false">取 消</el-button>
+                            <el-button type="primary" @click="addSubmit('addForm')">确 定</el-button>
+                        </span>
+                </el-dialog>
+
+                <el-dialog :title="editTitle" :visible.sync="dialogEdit" width="400px">
+                    <el-form @keyup.enter.native="editSubmit('editForm')" ref="editForm" :model="editForm" :rules="addRules"
+                             label-width="100px">
+                        <el-form-item label="角色名称" prop="mc">
+                            <el-input clearable v-model.trim="editForm.mc"></el-input>
+                        </el-form-item>
+                        <el-form-item label="角色描述" prop="bz">
+                            <el-input clearable v-model.trim="editForm.bz"></el-input>
+                        </el-form-item>
+
+                    </el-form>
+                    <span slot="footer" class="dialog-footer">
+                            <el-button @click="dialogEdit=false">取 消</el-button>
+                            <el-button type="primary" @click="editSubmit('editForm')">确 定</el-button>
+                        </span>
+                </el-dialog>
+
+                <el-dialog title="提示" :visible.sync="deleteShow" width="400px" top="30vh">
+                    <p>确定删除吗？</p>
+                    <span slot="footer" class="dialog-footer">
+                            <el-button @click="deleteShow = false">取 消</el-button>
+                            <el-button type="primary" @click="deltrue">确 定</el-button>
+                        </span>
+                </el-dialog>
+
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="elementui/index.js"></script>
+<script src="js/common.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                isfold: false,
+                pagesizes: [5, 8, 15, 20],
+                pagesize: 8,
+                currentPage: 1,
+                counts: 0,
+                tabledata: [],
+                jsid: null,
+                qxdata: [],
+                myselkeys: [],
+                defaultProps: {
+                    children: 'children',
+                    label: 'mc'
+                },
+                dialogAdd: false,
+                addTitle: '新增',
+                addForm: {
+                    mc: '',
+                    ms: '',
+                },
+                addRules: {
+                    mc: [{
+                        required: true,
+                        message: '角色名称不能为空',
+                        trigger: 'blur'
+                    },{ min: 1, max: 32, message: '长度在 1 到 32 个字符', trigger: 'blur' }],
+                    bz: [{
+                        required: true,
+                        message: '角色描述不能为空',
+                        trigger: 'blur'
+                    },{ min: 1, max: 64, message: '长度在 1 到 64 个字符', trigger: 'blur' }]
+                },
+                dialogEdit: false,
+                editTitle: '新增',
+                editForm: {
+                    mc: '',
+                    ms: '',
+                },
+                deleteShow: false,
+                deleteId:0,
+            }
+        },
+        methods: {
+            /*导航显示与隐藏*/
+            toggle: function () {
+                this.isfold = !this.isfold;
+            },
+            /*获取数据*/
+            getinfo: function () {
+                var that = this;
+                vehlic.ajax({
+                    type: "post",
+                    data:{
+                        page: that.currentPage,
+                        rows: that.pagesize
+                    },
+                    url: requesturl + "sysRolePermission/getRoleInfo",
+                    dataType: "json",
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                    },
+                    success: function (res) {
+                        if (res.code == 1) {
+                            that.tabledata = res.data;
+                            that.counts = res.total;
+                        } else {
+                            that.$message.error(res.message);
+                        }
+                    }
+                });
+            },
+            /*每页显示条数改变事件*/
+            sizechange: function (val) {
+                this.pagesize = val;
+                this.getinfo();
+            },
+            /*当前页改变事件*/
+            currentchange: function (val) {
+                this.currentPage = val;
+                this.getinfo();
+            },
+            /*新增按钮点击弹出框事件*/
+            add: function () {
+                this.dialogAdd = true;
+                if (typeof (this.$refs['addForm']) !== 'undefined') {
+                    this.$refs['addForm'].resetFields();
+                }
+                for (var i in this.addForm) {
+                    this.addForm[i] = '';
+                }
+            },
+            /*新增弹出框确定事件*/
+            addSubmit:function (formName) {
+                var that = this;
+                if( cantAjaxAgain() ){
+                    return;
+                }
+                this.$refs[formName].validate(function (valid) {
+                    if (valid) {
+                        vehlic.ajax({
+                            type: "post",
+                            url: requesturl + "sysRolePermission/save",
+                            data: that.addForm,
+                            dataType: "json",
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                            },
+                            success: function (res) {
+                                if (res.code == 1) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '添加成功',
+                                        type: 'success'
+                                    });
+                                    that.dialogAdd = false;
+                                    that.getinfo();
+                                } else {
+                                    that.$message.error(res.message);
+                                }
+                            }
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            /*编辑按钮点击弹出框事件*/
+            editinfo: function (row) {
+                var that = this;
+                that.dialogEdit = true;
+                if (typeof (this.$refs['editForm']) !== 'undefined') {
+                    this.$refs['editForm'].resetFields();
+                }
+                that.editForm = JSON.parse(JSON.stringify(row));
+                this.editForm.createtime = this.convertDateFromString(this.editForm.createtime);
+                this.editForm.updatetime = this.convertDateFromString(this.editForm.updatetime);
+            },
+            /*编辑弹出框确定事件*/
+            editSubmit: function (formName) {
+                var that = this;
+                if( cantAjaxAgain() ){
+                    return;
+                }
+                this.$refs[formName].validate(function (valid) {
+                    if (valid) {
+                        vehlic.ajax({
+                            type: "post",
+                            url: requesturl + "sysRolePermission/save",
+                            data: that.editForm,
+                            dataType: "json",
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                            },
+                            success: function (res) {
+                                if (res.code == 1) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '修改成功',
+                                        type: 'success'
+                                    });
+                                    that.dialogEdit = false;
+                                    that.getinfo();
+                                } else {
+                                    that.$message.error(res.message);
+                                }
+                            }
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            /*删除按钮点击弹出框事件*/
+            delinfo: function (row) {
+                this.deleteShow = true;
+                this.deleteId = row.id;
+            },
+            /*删除弹出框确认事件*/
+            deltrue: function () {
+                this.deleteShow = false;
+                var that = this;
+                vehlic.ajax({
+                    type: "post",
+                    url: requesturl + "sysRolePermission/delete",
+                    data: {
+                        id: that.deleteId
+                    },
+                    dataType: "json",
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                    },
+                    success: function (res) {
+                        if (res.code == 1) {
+                            that.$message({
+                                showClose: true,
+                                message: '删除成功',
+                                type: 'success'
+                            });
+                            that.getinfo();
+                        } else {
+                            that.$message.error(res.message);
+                        }
+                    }
+                });
+            },
+            /*日期字符串转date类型方法*/
+            convertDateFromString: function (dateString) {
+                if (dateString) {
+                    var d = new Date(Date.parse(dateString.replace(/-/g, "/")));
+                    return d;
+                }
+            },
+        },
+        mounted: function () {
+            this.getinfo();
+        }
+    })
+</script>
+
+</html>

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="x-ua-compatible" content="IE=Edge">
+    <title>系统管理-系统配置</title>
+    <link rel="shortcut icon" href="img/icon.ico"/>
+    <link rel="stylesheet" href="elementui/index.css">
+    <link rel="stylesheet" href="css/style.css"/>
+</head>
+
+<body>
+<div id="app" class="heiall bigcont" v-cloak>
+    <div id="headerwarp"></div>
+    <div class="content clearfloat">
+        <div id="navwarp" v-show="!isfold"></div>
+        <div class="contright" id="content" :class="{'contrtpad':!isfold,'contrtpadno':isfold}">
+            <div class="contrighton">
+                <div class="clearfloat contentdiv">
+                    <div class="fl">
+                        <el-form @keyup.enter.native="dosearch" :inline="true" ref="searchinfo" :model="searchinfo"
+                                 class="demo-form-inline">
+                            <el-form-item label="参数类别">
+                                <el-select v-model="searchinfo.cslb" placeholder="请选择参数类别" clearable>
+                                    <el-option v-for="(item, index) in sz" :key="index" :label="item.cslb"
+                                               :value="item.cslb">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item label="参数代号">
+                                <el-input v-model.trim="searchinfo.csdh" :maxlength="16" clearable
+                                          placeholder="根据参数代号查询"
+                                          class="inputmid"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" icon="el-icon-search" @click="dosearch">查询</el-button>
+                            </el-form-item>
+                        </el-form>
+                    </div>
+                </div>
+                <div class="contentdiv2">
+                    <div class="fl search-list">
+                        <img src="../img/cxjg.png" alt="" class="search-list" >查询结果
+                    </div>
+                    <div class="fr marbtm20">
+                        <el-button type="primary" icon="el-icon-circle-plus" @click="addinfo">新增参数</el-button>
+                    </div>
+                    <div class="marbtm20">
+                        <template>
+                            <el-table :data="tabledata" border stripe style="width: 100%">
+                                <el-table-column label="序号" type="index" width="60" align="center">
+                                    <template scope="scope"><span>{{scope.$index+(currentPage - 1) * pagesize + 1}}
+                                            </span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column prop="cslb" label="参数类别" width="120" show-overflow-tooltip>
+                                </el-table-column>
+                                <el-table-column prop="lbsm" label="类别说明" width="120" show-overflow-tooltip>
+                                </el-table-column>
+                                <el-table-column prop="csdh" label="参数代号" show-overflow-tooltip>
+                                </el-table-column>
+                                <el-table-column prop="cssm" label="参数值" width="120" show-overflow-tooltip>
+                                </el-table-column>
+                                <el-table-column prop="bz1" label="备注" show-overflow-tooltip>
+                                </el-table-column>
+                                <el-table-column fixed="right" label="操作" width="200" align="center">
+                                    <template slot-scope="scope">
+                                        <el-button v-if="scope.row.editflg" @click="editinfo(scope.row)" type="primary" icon="el-icon-edit"
+                                                   size="small">编辑</el-button>
+                                        <el-button v-if="scope.row.editflg" @click="delinfo(scope.row)" type="danger" icon="el-icon-delete"
+                                                   size="small">删除</el-button>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </template>
+                    </div>
+                    <div class="saveck">
+                        <div class="block">
+                            <el-pagination background @size-change="sizechange" @current-change="currentchange"
+                                           :current-page="currentPage" :page-sizes="pagesizes" :page-size="pagesize"
+                                           layout="total, sizes, prev, pager, next, jumper"
+                                           :total="counts">
+                            </el-pagination>
+                        </div>
+                    </div>
+                </div>
+                <el-dialog :title="addtitle" :visible.sync="dialogadd" width="400px">
+                    <el-form @keyup.enter.native="addsubmit('addform')" ref="addform" :model="addform" :rules="addrules"
+                             label-width="80px">
+                        <el-form-item label="参数类别" prop="cslb">
+                            <el-select @change="changeAddType" v-model.trim="addform.cslb" placeholder="请选择参数类别"
+                                       style="width: 100%;">
+                                <el-option v-for="(item, index) in sz" :key="index" :label="item.cslb"
+                                           :value="item.cslb">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="类别说明">
+                            <el-input :disabled="true" v-model.trim="addform.lbsm" :maxlength="32"></el-input>
+                        </el-form-item>
+                        <el-form-item label="参数代号" prop="csdh">
+                            <el-input clearable v-model.trim="addform.csdh" :maxlength="16"></el-input>
+                        </el-form-item>
+                        <el-form-item label="参数值">
+                            <el-input clearable v-model.trim="addform.cssm" :maxlength="64"></el-input>
+                        </el-form-item>
+                        <el-form-item label="备注">
+                            <el-input clearable v-model.trim="addform.bz1" :maxlength="32"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <span slot="footer" class="dialog-footer">
+                            <el-button @click="dialogadd=false">取 消</el-button>
+                            <el-button type="primary" @click="addsubmit('addform')">确 定</el-button>
+                        </span>
+                </el-dialog>
+                <el-dialog :title="edittitle" :visible.sync="dialogedit" width="400px">
+                    <el-form @keyup.enter.native="editsubmit('editform')" ref="editform" :model="editform"
+                             :rules="edtrules" label-width="100px">
+                        <el-form-item label="参数类别">
+                            <el-input :disabled="true" v-model.trim="editform.cslb"></el-input>
+                        </el-form-item>
+                        <el-form-item label="类别说明">
+                            <el-input :disabled="true" v-model.trim="editform.lbsm" :maxlength="32"></el-input>
+                        </el-form-item>
+                        <el-form-item label="参数代号" prop="csdh">
+                            <el-input clearable v-model.trim="editform.csdh" :maxlength="16"></el-input>
+                        </el-form-item>
+                        <el-form-item label="参数值">
+                            <el-input clearable v-model.trim="editform.cssm" :maxlength="64"></el-input>
+                        </el-form-item>
+                        <el-form-item label="备注">
+                            <el-input clearable v-model.trim="editform.bz1" :maxlength="32"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <span slot="footer" class="dialog-footer">
+                            <el-button @click="dialogedit=false">取 消</el-button>
+                            <el-button type="primary" @click="editsubmit('editform')">确 定</el-button>
+                        </span>
+                </el-dialog>
+                <el-dialog title="提示" :visible.sync="delsure" width="400px" top="30vh">
+                    <p>确定删除吗？</p>
+                    <span slot="footer" class="dialog-footer">
+                            <el-button @click="delsure = false">取 消</el-button>
+                            <el-button type="primary" @click="deltrue">确 定</el-button>
+                        </span>
+                </el-dialog>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="elementui/index.js"></script>
+<script src="js/common.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                dialogadd: false,
+                addtitle: '新增参数',
+                dialogedit: false,
+                edittitle: '编辑参数',
+                delsure: false,
+                editable: false,
+                tabledata: [],
+                deleteid: null,
+                searchinfo: {
+                    cslb: '',
+                    csdh: ''
+                },
+                addform: {
+                    cslb: '',
+                    lbsm: '',
+                    csdh: '',
+                    cssm: '',
+                    bz1: ''
+                },
+                editform: {
+                    csid: '',
+                    cslb: '',
+                    lbsm: '',
+                    csdh: '',
+                    cssm: '',
+                    bz1: ''
+                },
+                addrules: {
+                    cslb: [
+                        {required: true, message: '参数类别不能为空', trigger: 'blur'}
+                    ],
+                    csdh: [
+                        {required: true, message: '参数代号不能为空', trigger: 'blur'}
+                    ]
+                },
+                edtrules: {
+                    csdh: [
+                        {required: true, message: '参数代号不能为空', trigger: 'blur'}
+                    ]
+                },
+                pagesizes: [5, 8, 15, 20],
+                pagesize: 8,
+                currentPage: 1,
+                counts: 0,
+                sz: [],
+                isfold: false
+            }
+        },
+        methods: {
+            /*导航显示与隐藏*/
+            toggle: function () {
+                this.isfold = !this.isfold;
+            },
+
+            changeAddType: function (value) {
+                for (var x = 0; x < this.sz.length; x++) {
+                    if (this.sz[x].cslb == value) {
+                        this.addform.lbsm = this.sz[x].lbsm;
+                        return;
+                    }
+                }
+            },
+            /*获取数据*/
+            getinfo: function () {
+                var that = this;
+                vehlic.ajax({
+                    type: "post",
+                    url: requesturl + "tbParam/getParamByPage",
+                    data: {
+                        page: that.currentPage,
+                        rows: that.pagesize,
+                        cslb: that.searchinfo.cslb,
+                        csdh: that.searchinfo.csdh
+                    },
+                    dataType: "json",
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                    },
+                    success: function (res) {
+                        if (res.code == 1) {
+                            that.tabledata = res.data;
+                            that.counts = res.total;
+                        } else {
+                            that.$message.error(res.message);
+                        }
+                    }
+                });
+            },
+            /*安全策略配置按钮点击事件*/
+            safeset: function () {
+                var that = this;
+                vehlic.ajax({
+                    type: "post",
+                    url: requesturl + "tbParam/getParamByPage",
+                    data: {page: that.currentPage, rows: that.pagesize, isLike: 1, cslb: "06"},
+                    dataType: "json",
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                    },
+                    success: function (res) {
+                        if (res.code == 1) {
+                            that.tabledata = res.data;
+                            that.counts = res.total;
+                        } else {
+                            that.$message.error(res.message);
+                        }
+                    }
+                });
+            },
+            /*获取参数列表*/
+            getcs: function () {
+                var that = this;
+                vehlic.ajax({
+                    type: "post",
+                    url: requesturl + "tbParam/getCslb",
+                    dataType: "json",
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                    },
+                    success: function (res) {
+                        if (res.code == 1) {
+                            that.sz = res.data;
+                        } else {
+                            that.$message.error(res.message);
+                        }
+                    }
+                });
+            },
+            /*新增按钮点击弹出框事件*/
+            addinfo: function () {
+                this.dialogadd = true;
+                if (typeof (this.$refs['addform']) !== 'undefined') {
+                    this.$refs['addform'].resetFields();
+                }
+                for (var i in this.addform) {
+                    this.addform[i] = '';
+                }
+            },
+            /*新增弹出框确定事件*/
+            addsubmit: function (formName) {
+                var that = this;
+                if( cantAjaxAgain() ){
+                    return;
+                }
+                this.$refs[formName].validate(function (valid) {
+                    if (valid) {
+                        vehlic.ajax({
+                            type: "post",
+                            url: requesturl + "tbParam/saveParam",
+                            data: that.addform,
+                            dataType: "json",
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                            },
+                            success: function (res) {
+                                if (res.code == 1) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '添加成功',
+                                        type: 'success'
+                                    });
+                                    that.dialogadd = false;
+                                    that.getinfo();
+                                } else {
+                                    that.$message.error(res.message);
+                                }
+                            }
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            /*编辑按钮点击弹出框事件*/
+            editinfo: function (row) {
+                var that = this;
+                that.dialogedit = true;
+                that.editform.csid = row.csid;
+                if (typeof (that.$refs['editform']) !== 'undefined') {
+                    that.$refs['editform'].resetFields();
+                }
+                vehlic.ajax({
+                    type: "post",
+                    url: requesturl + "tbParam/getParam",
+                    data: {id: row.csid},
+                    dataType: "json",
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                    },
+                    success: function (res) {
+                        if (res.code == 1) {
+                            //that.editform = res.data;
+                            var editData = that.editform;
+                            for (var x in editData) {
+                                editData[x] = res.data[x];
+                            }
+
+
+                        } else {
+                            that.$message.error(res.message);
+                        }
+                    }
+                });
+            },
+            /*编辑弹出框确定事件*/
+            editsubmit: function (formName) {
+                var that = this;
+                if( cantAjaxAgain() ){
+                    return;
+                }
+                this.$refs[formName].validate(function (valid) {
+                    if (valid) {
+                        vehlic.ajax({
+                            type: "post",
+                            url: requesturl + "tbParam/editParam",
+                            data: that.editform,
+                            dataType: "json",
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                            },
+                            success: function (res) {
+                                if (res.code == 1) {
+                                    that.$message({
+                                        showClose: true,
+                                        message: '修改成功',
+                                        type: 'success'
+                                    });
+                                    that.dialogedit = false;
+                                    that.getinfo();
+                                } else {
+                                    that.$message.error(res.message);
+                                }
+                            }
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            /*删除按钮点击弹出框事件*/
+            delinfo: function (row) {
+                this.delsure = true;
+                this.deleteid = row.csid;
+            },
+            /*删除弹出框确认事件*/
+            deltrue: function () {
+                this.delsure = false;
+                var that = this;
+                vehlic.ajax({
+                    type: "post",
+                    url: requesturl + "tbParam/deleteParam",
+                    data: {id: that.deleteid},
+                    dataType: "json",
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                    },
+                    success: function (res) {
+                        if (res.code == 1) {
+                            that.$message({
+                                showClose: true,
+                                message: '删除成功',
+                                type: 'success'
+                            });
+                            that.getinfo();
+                        } else {
+                            that.$message.error(res.message);
+                        }
+                    }
+                });
+            },
+            /*条件查询点击事件*/
+            dosearch: function () {
+                this.currentPage = 1;
+                this.getinfo();
+            },
+            /*每页显示条数改变事件*/
+            sizechange: function (val) {
+                this.pagesize = val;
+                this.getinfo();
+            },
+            /*当前页改变事件*/
+            currentchange: function (val) {
+                this.currentPage = val;
+                this.getinfo();
+            },
+            /*日期字符串转date类别方法*/
+            convertDateFromString: function (dateString) {
+                if (dateString) {
+                    var d = new Date(Date.parse(dateString.replace(/-/g, "/")));
+                    return d;
+                }
+            }
+        },
+        mounted: function () {
+            this.getinfo();
+            this.getcs();
+        }
+    })
+</script>
+
+</html>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xiongdi.ocdm.mapper.dao.LogLoginMapper">
+  <resultMap id="BaseResultMap" type="cn.xiongdi.ocdm.mapper.model.LogLogin">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="dlsj" jdbcType="TIMESTAMP" property="dlsj" />
+    <result column="dlip" jdbcType="CHAR" property="dlip" />
+    <result column="dlmac" jdbcType="CHAR" property="dlmac" />
+    <result column="dlzt" jdbcType="BIGINT" property="dlzt" />
+    <result column="bz" jdbcType="VARCHAR" property="bz" />
+    <result column="dlyhm" jdbcType="CHAR" property="dlyhm" />
+    <result column="dllx" jdbcType="CHAR" property="dllx" />
+    <result column="dljg" jdbcType="CHAR" property="dljg" />
+    <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
+    <result column="createuid" jdbcType="CHAR" property="createuid" />
+    <result column="createip" jdbcType="CHAR" property="createip" />
+    <result column="updatetime" jdbcType="TIMESTAMP" property="updatetime" />
+    <result column="updateuid" jdbcType="CHAR" property="updateuid" />
+    <result column="updateip" jdbcType="CHAR" property="updateip" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, dlsj, dlip, dlmac, dlzt, bz, dlyhm, dllx, dljg, createtime, createuid, createip, 
+    updatetime, updateuid, updateip
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from log_login
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="getLoginLogList" resultMap="BaseResultMap" parameterType="cn.xiongdi.ocdm.mapper.model.LoginLogRq">
+    select  <include refid="Base_Column_List" /> from log_login where 1=1
+    <if test="dlip!='' and dlip!=null">
+      AND dlip LIKE concat(concat('%' ,CONCAT('/',#{dlip,jdbcType=CHAR})), '%') ESCAPE '/'
+    </if>
+    <if test="dlyhm!='' and dlyhm!=null">
+      AND dlyhm LIKE concat(concat('%' ,CONCAT('/',#{dlyhm,jdbcType=CHAR})), '%') ESCAPE '/'
+    </if>
+    <choose>
+      <when test="order=='desc'">
+        order by dlsj DESC
+      </when>
+      <otherwise>
+        order by dlsj ASC
+      </otherwise>
+    </choose>
+  </select>
+  <select id="selectByDlzt" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from log_login
+    where dlzt = #{dlzt,jdbcType=BIGINT}
+  </select>
+  <select id="selectSecondId" parameterType="java.lang.String" resultType="java.lang.Long">
+    select max(id)
+    from log_login
+    where id not in
+    (select max(id) from log_login
+    where dljg ='成功'
+    and dllx='登录'
+    and dlyhm = #{dlyhm,jdbcType=CHAR})
+    and dljg ='成功'
+    and dllx='登录'
+    and dlyhm = #{dlyhm,jdbcType=CHAR}
+  </select>
+    <select id="getHistoryUserInfo" resultMap="BaseResultMap" parameterType="cn.xiongdi.ocdm.mapper.model.SysUser">
+        select
+        <include refid="Base_Column_List" />
+        from log_login a
+        where a.dlyhm = #{yhm,jdbcType=CHAR}
+       <if test="his_dlsj != null and his_dlsj != ''">
+        and a.dlsj &gt;= str_to_date(#{his_dlsj,jdbcType=CHAR}, '%Y-%m-%d %H:%i:%s')
+       </if>
+        and a.dlsj &lt;= #{scdlsj,jdbcType=TIMESTAMP}
+        order by dlsj DESC
+    </select>
+
+  <insert id="insert" parameterType="cn.xiongdi.ocdm.mapper.model.LogLogin">
+    insert into log_login (
+      id,
+      dlsj,
+      dlip,
+      dlmac,
+      dlzt,
+      bz,
+      dlyhm,
+      dllx,
+      dljg,
+      createtime,
+      createuid,
+      createip,
+      updatetime,
+      updateuid,
+      updateip
+    )
+    values (#{id,jdbcType=BIGINT}, #{dlsj,jdbcType=TIMESTAMP},
+    #{dlip,jdbcType=CHAR}, #{dlmac,jdbcType=CHAR}, #{dlzt,jdbcType=BIGINT}, #{bz,jdbcType=VARCHAR},
+    #{dlyhm,jdbcType=CHAR}, #{dllx,jdbcType=CHAR}, #{dljg,jdbcType=CHAR},
+    #{createtime,jdbcType=TIMESTAMP}, #{createuid,jdbcType=CHAR}, #{createip,jdbcType=CHAR},
+    #{updatetime,jdbcType=TIMESTAMP}, #{updateuid,jdbcType=CHAR}, #{updateip,jdbcType=CHAR}
+    )
+  </insert>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from log_login
+    where dlyhm = #{dlyhm,jdbcType=CHAR}
+  </delete>
+</mapper>

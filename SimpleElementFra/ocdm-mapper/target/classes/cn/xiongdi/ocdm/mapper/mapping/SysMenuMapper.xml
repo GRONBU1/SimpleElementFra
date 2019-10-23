@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xiongdi.ocdm.mapper.dao.SysMenuMapper">
+  <resultMap id="BaseResultMap" type="cn.xiongdi.ocdm.mapper.model.SysMenu">
+    <id column="menuid" jdbcType="BIGINT" property="menuid" />
+    <result column="cdbh" jdbcType="CHAR" property="cdbh" />
+    <result column="mc" jdbcType="CHAR" property="mc" />
+    <result column="cdjb" jdbcType="BIGINT" property="cdjb" />
+    <result column="sjcdid" jdbcType="BIGINT" property="sjcdid" />
+    <result column="url" jdbcType="CHAR" property="url" />
+    <result column="apiurl" jdbcType="CHAR" property="apiurl" />
+    <result column="pic" jdbcType="CHAR" property="pic" />
+    <result column="sfqy" jdbcType="CHAR" property="sfqy" />
+    <result column="bz" jdbcType="CHAR" property="bz" />
+    <result column="sjcdmc" jdbcType="CHAR" property="sjcdmc" />
+    <result column="jxjy" jdbcType="CHAR" property="jxjy" />
+    <result column="hxgn" jdbcType="CHAR" property="hxgn" />
+    <result column="fcgyw" jdbcType="CHAR" property="fcgyw" />
+    <result column="ssjslb" jdbcType="CHAR" property="ssjslb" />
+    <result column="sortNumber" jdbcType="BIGINT" property="sortnumber" />
+    <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
+    <result column="createuid" jdbcType="CHAR" property="createuid" />
+    <result column="createip" jdbcType="CHAR" property="createip" />
+    <result column="updatetime" jdbcType="TIMESTAMP" property="updatetime" />
+    <result column="updateuid" jdbcType="CHAR" property="updateuid" />
+    <result column="updateip" jdbcType="CHAR" property="updateip" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    menuid, cdbh, mc, cdjb, sjcdid, url,apiurl, pic, sfqy, bz, sjcdmc, jxjy, hxgn, fcgyw, ssjslb,
+    sortNumber, createtime, createuid, createip, updatetime, updateuid, updateip
+  </sql>
+
+  <!--获取获取相关类别的顶级菜单-->
+  <select id="selectSysMenuByCdjb" parameterType="cn.xiongdi.ocdm.mapper.model.SysMenu" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sys_menu
+    where cdjb = #{cdjb,jdbcType=BIGINT}
+    order by menuid
+  </select>
+  <select id="selectMenuTreeByRole" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from (
+    SELECT
+    distinct C.*
+    FROM
+    sys_menu A
+    INNER JOIN
+    sys_rolepermission B ON A.menuid = B.menuid
+    INNER JOIN  sys_menu C on A.sjcdid = C.menuid
+    where A.sjcdid!=0
+    AND B.jsid =  #{sjcdid,jdbcType=CHAR}
+    AND A.sfqy = '1' AND (#{sfjy,jdbcType=CHAR} = '1' OR A.jxjy = #{sfjy,jdbcType=CHAR})
+    union all
+    SELECT
+    A.*
+    FROM
+    sys_menu A
+    INNER JOIN
+    sys_rolepermission B ON A.menuid = B.menuid
+    where A.sjcdid!=0
+    and B.jsid =  #{sjcdid,jdbcType=CHAR}
+    AND A.sfqy = '1' AND(#{sfjy,jdbcType=CHAR} = '1' OR A.jxjy = #{sfjy,jdbcType=CHAR}))D
+    order by D.sjcdid,D.sortNumber
+  </select>
+
+  <!--根据上级菜单查询下级菜单-->
+  <select id="selectSysMenuBySjcdid" parameterType="cn.xiongdi.ocdm.mapper.model.SysMenu" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sys_menu
+    where sjcdid = #{sjcdid,jdbcType=BIGINT}
+    order by sjcdid,sortNumber
+  </select>
+  <select id="selectSysMenuByUrl" parameterType="java.lang.String"  resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sys_menu
+    where
+    url = #{url,jdbcType=CHAR}
+    OR
+    apiurl LIKE concat(concat('%' ,CONCAT('/',#{url,jdbcType=CHAR})), '%') ESCAPE '/'
+    limit 1
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_menu
+    where menuid = #{menuid,jdbcType=BIGINT}
+  </select>
+  <select id="selectByCdbh" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sys_menu
+    where cdbh = #{cdbh,jdbcType=CHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from sys_menu
+    where menuid = #{menuid,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="cn.xiongdi.ocdm.mapper.model.SysMenu">
+    insert into sys_menu (menuid, cdbh, mc, cdjb, 
+      sjcdid, url, pic, sfqy, 
+      bz, sjcdmc, jxjy, hxgn, 
+      fcgyw, ssjslb, sortNumber, 
+      createtime, createuid, createip, 
+      updatetime, updateuid, updateip
+      )
+    values (#{menuid,jdbcType=BIGINT}, #{cdbh,jdbcType=CHAR}, #{mc,jdbcType=CHAR}, #{cdjb,jdbcType=BIGINT}, 
+      #{sjcdid,jdbcType=BIGINT}, #{url,jdbcType=CHAR}, #{pic,jdbcType=CHAR}, #{sfqy,jdbcType=CHAR}, 
+      #{bz,jdbcType=CHAR}, #{sjcdmc,jdbcType=CHAR}, #{jxjy,jdbcType=CHAR}, #{hxgn,jdbcType=CHAR}, 
+      #{fcgyw,jdbcType=CHAR}, #{ssjslb,jdbcType=CHAR}, #{sortnumber,jdbcType=BIGINT}, 
+      #{createtime,jdbcType=TIMESTAMP}, #{createuid,jdbcType=CHAR}, #{createip,jdbcType=CHAR}, 
+      #{updatetime,jdbcType=TIMESTAMP}, #{updateuid,jdbcType=CHAR}, #{updateip,jdbcType=CHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="cn.xiongdi.ocdm.mapper.model.SysMenu">
+    insert into sys_menu
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="menuid != null">
+        menuid,
+      </if>
+      <if test="cdbh != null">
+        cdbh,
+      </if>
+      <if test="mc != null">
+        mc,
+      </if>
+      <if test="cdjb != null">
+        cdjb,
+      </if>
+      <if test="sjcdid != null">
+        sjcdid,
+      </if>
+      <if test="url != null">
+        url,
+      </if>
+      <if test="pic != null">
+        pic,
+      </if>
+      <if test="sfqy != null">
+        sfqy,
+      </if>
+      <if test="bz != null">
+        bz,
+      </if>
+      <if test="sjcdmc != null">
+        sjcdmc,
+      </if>
+      <if test="jxjy != null">
+        jxjy,
+      </if>
+      <if test="hxgn != null">
+        hxgn,
+      </if>
+      <if test="fcgyw != null">
+        fcgyw,
+      </if>
+      <if test="ssjslb != null">
+        ssjslb,
+      </if>
+      <if test="sortnumber != null">
+        sortNumber,
+      </if>
+      <if test="createtime != null">
+        createtime,
+      </if>
+      <if test="createuid != null">
+        createuid,
+      </if>
+      <if test="createip != null">
+        createip,
+      </if>
+      <if test="updatetime != null">
+        updatetime,
+      </if>
+      <if test="updateuid != null">
+        updateuid,
+      </if>
+      <if test="updateip != null">
+        updateip,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="menuid != null">
+        #{menuid,jdbcType=BIGINT},
+      </if>
+      <if test="cdbh != null">
+        #{cdbh,jdbcType=CHAR},
+      </if>
+      <if test="mc != null">
+        #{mc,jdbcType=CHAR},
+      </if>
+      <if test="cdjb != null">
+        #{cdjb,jdbcType=BIGINT},
+      </if>
+      <if test="sjcdid != null">
+        #{sjcdid,jdbcType=BIGINT},
+      </if>
+      <if test="url != null">
+        #{url,jdbcType=CHAR},
+      </if>
+      <if test="pic != null">
+        #{pic,jdbcType=CHAR},
+      </if>
+      <if test="sfqy != null">
+        #{sfqy,jdbcType=CHAR},
+      </if>
+      <if test="bz != null">
+        #{bz,jdbcType=CHAR},
+      </if>
+      <if test="sjcdmc != null">
+        #{sjcdmc,jdbcType=CHAR},
+      </if>
+      <if test="jxjy != null">
+        #{jxjy,jdbcType=CHAR},
+      </if>
+      <if test="hxgn != null">
+        #{hxgn,jdbcType=CHAR},
+      </if>
+      <if test="fcgyw != null">
+        #{fcgyw,jdbcType=CHAR},
+      </if>
+      <if test="ssjslb != null">
+        #{ssjslb,jdbcType=CHAR},
+      </if>
+      <if test="sortnumber != null">
+        #{sortnumber,jdbcType=BIGINT},
+      </if>
+      <if test="createtime != null">
+        #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createuid != null">
+        #{createuid,jdbcType=CHAR},
+      </if>
+      <if test="createip != null">
+        #{createip,jdbcType=CHAR},
+      </if>
+      <if test="updatetime != null">
+        #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateuid != null">
+        #{updateuid,jdbcType=CHAR},
+      </if>
+      <if test="updateip != null">
+        #{updateip,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.xiongdi.ocdm.mapper.model.SysMenu">
+    update sys_menu
+    <set>
+      <if test="cdbh != null">
+        cdbh = #{cdbh,jdbcType=CHAR},
+      </if>
+      <if test="mc != null">
+        mc = #{mc,jdbcType=CHAR},
+      </if>
+      <if test="cdjb != null">
+        cdjb = #{cdjb,jdbcType=BIGINT},
+      </if>
+      <if test="sjcdid != null">
+        sjcdid = #{sjcdid,jdbcType=BIGINT},
+      </if>
+      <if test="url != null">
+        url = #{url,jdbcType=CHAR},
+      </if>
+      <if test="pic != null">
+        pic = #{pic,jdbcType=CHAR},
+      </if>
+      <if test="sfqy != null">
+        sfqy = #{sfqy,jdbcType=CHAR},
+      </if>
+      <if test="bz != null">
+        bz = #{bz,jdbcType=CHAR},
+      </if>
+      <if test="sjcdmc != null">
+        sjcdmc = #{sjcdmc,jdbcType=CHAR},
+      </if>
+      <if test="jxjy != null">
+        jxjy = #{jxjy,jdbcType=CHAR},
+      </if>
+      <if test="hxgn != null">
+        hxgn = #{hxgn,jdbcType=CHAR},
+      </if>
+      <if test="fcgyw != null">
+        fcgyw = #{fcgyw,jdbcType=CHAR},
+      </if>
+      <if test="ssjslb != null">
+        ssjslb = #{ssjslb,jdbcType=CHAR},
+      </if>
+      <if test="sortnumber != null">
+        sortNumber = #{sortnumber,jdbcType=BIGINT},
+      </if>
+      <if test="createtime != null">
+        createtime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createuid != null">
+        createuid = #{createuid,jdbcType=CHAR},
+      </if>
+      <if test="createip != null">
+        createip = #{createip,jdbcType=CHAR},
+      </if>
+      <if test="updatetime != null">
+        updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateuid != null">
+        updateuid = #{updateuid,jdbcType=CHAR},
+      </if>
+      <if test="updateip != null">
+        updateip = #{updateip,jdbcType=CHAR},
+      </if>
+    </set>
+    where menuid = #{menuid,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.xiongdi.ocdm.mapper.model.SysMenu">
+    update sys_menu
+    set cdbh = #{cdbh,jdbcType=CHAR},
+      mc = #{mc,jdbcType=CHAR},
+      cdjb = #{cdjb,jdbcType=BIGINT},
+      sjcdid = #{sjcdid,jdbcType=BIGINT},
+      url = #{url,jdbcType=CHAR},
+      pic = #{pic,jdbcType=CHAR},
+      sfqy = #{sfqy,jdbcType=CHAR},
+      bz = #{bz,jdbcType=CHAR},
+      sjcdmc = #{sjcdmc,jdbcType=CHAR},
+      jxjy = #{jxjy,jdbcType=CHAR},
+      hxgn = #{hxgn,jdbcType=CHAR},
+      fcgyw = #{fcgyw,jdbcType=CHAR},
+      ssjslb = #{ssjslb,jdbcType=CHAR},
+      sortNumber = #{sortnumber,jdbcType=BIGINT},
+      createtime = #{createtime,jdbcType=TIMESTAMP},
+      createuid = #{createuid,jdbcType=CHAR},
+      createip = #{createip,jdbcType=CHAR},
+      updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      updateuid = #{updateuid,jdbcType=CHAR},
+      updateip = #{updateip,jdbcType=CHAR}
+    where menuid = #{menuid,jdbcType=BIGINT}
+  </update>
+</mapper>

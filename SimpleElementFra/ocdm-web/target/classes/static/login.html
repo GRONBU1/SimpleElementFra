@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html style="overflow: hidden;">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <title>登录</title>
+    <link rel="shortcut icon" href="img/icon.ico" />
+    <link rel="stylesheet" href="elementui/index.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <script>/*@cc_on
+		var _iealwn = {once: 0, outver: 8};
+		document.write('\x3Cscript id="_iealwn_js" src="//support.dmeng.net/ie-alert-warning/latest.js">\x3C/script>'); 
+		@*/</script>
+    <script src="js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/vue.js"></script>
+    <script src="elementui/index.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/common.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body class="loginbg">
+    <div class="logincont" id="app" v-cloak>
+        <div class="loginwarpbig" style="right: 300px;">
+            <div class="alertwid">
+                <el-alert :title="logininfoText" type="error" :closable="false" center v-if="logininfo">
+                </el-alert>
+            </div>
+            <div class="loginwarp">
+                <div class="logintop clearfloat">
+                    <h2 class="loginh2">青海普通护照管理系统</h2>
+                </div>
+                <div class="logindown">
+                    <el-form @keyup.enter.native="onSubmit" ref="loginform" :model="loginform" :rules="loginrules">
+                        <el-form-item prop="username">
+                            <el-input clearable :maxlength="32" tabindex="1" placeholder="请输入用户名" v-model.trim="loginform.username">
+                                <template slot="prepend"><i class="my-icon-user"></i></template>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item prop="mypassword">
+                            <el-input clearable :maxlength="32"  tabindex="2" type="password" placeholder="请输入密码" v-model.trim="loginform.mypassword">
+                                    <template slot="prepend"><i class="my-icon-password"></i></template>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <div class="subbtn">
+                                <el-button type="primary" @click="onSubmit" class="subbtn" style="font-size: 18px">登录</el-button>
+                            </div>
+                        </el-form-item>
+                        <!--<div class="saveck red" v-if="logininfo">
+                        请先登录系统！
+                    </div>-->
+                    </el-form>
+                </div>
+            </div>
+        </div>
+        <el-dialog title="修改密码" :visible.sync="passwordVisible" width="400px">
+            <el-form @keyup.enter.native="passwordyz" ref="mmform" :model="mmform" :rules="mmrules" label-width="80px">
+                <el-form-item label="原密码" prop="oldpassowrd">
+                    <el-input type="password" clearable placeholder="输入原密码" :maxlength="32" v-model.trim="mmform.oldpassowrd"></el-input>
+                </el-form-item>
+                <el-form-item label="新密码" prop="password1">
+                    <el-input type="password" clearable placeholder="输入新密码" :maxlength="32" v-model.trim="mmform.password1"></el-input>
+                </el-form-item>
+                <el-form-item label="新密码" prop="password2">
+                    <el-input type="password" clearable placeholder="再次输入新密码" :maxlength="32" v-model.trim="mmform.password2"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="passwordVisible = false">取 消</el-button>
+                <el-button type="primary" @click="passwordyz">确 定</el-button>
+            </span>
+        </el-dialog>
+
+       
+    </div>
+    <div id="browser-chrome" class="browser-more" style="color:#d0d0d0">
+        请使用谷歌Chrome浏览器浏览该网页：
+        <a target="_blank" style="text-decoration: underline;margin-right: 15px;color: rgba(207, 207, 207, 1)" href="exe/Chrome_XP.exe">点击下载XP版</a>
+        <a target="_blank" style="text-decoration: underline;color: rgba(207, 207, 207, 1)" href="exe/ChromeWin7.exe">点击下载版Win7版</a>
+    </div>
+    <div class="footlogo">
+        <div class="footon">
+            西宁市城东区八一中路50号-青海省公安厅
+            <br>
+            版权所有© 深圳市雄帝科技股份有限公司
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+    // 获取浏览器的地址信息
+    var chromeurl = window.location.search;
+    var keyText = chromeurl.substring(chromeurl.lastIndexOf('?') + 1, chromeurl.lastIndexOf('='));
+    var valueTextCode = chromeurl.substring(chromeurl.lastIndexOf('=') + 1, chromeurl.length);
+    var valueText = decodeURI(valueTextCode);
+
+    var href = window.location.href;
+    var topHref = window.top.location.href;
+    if (href != topHref) {
+        window.top.location.href = href;
+    }
+
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                passwordVisible: false,
+                logininfo: false,
+                loginform: {
+                    username: '',
+                    mypassword: ''
+                },
+                loginrules: {
+                    username: [
+                        { required: true, message: '用户名不能为空', trigger: 'blur' }
+                    ],
+                    mypassword: [
+                        { required: true, message: '密码不能为空', trigger: 'blur' }
+                    ]
+                },
+                mmform: {
+                    password1: '',
+                    password2: '',
+                    oldpassowrd: ''
+                },
+                mmrules: {
+                    oldpassowrd: [
+                        { required: true, message: '原密码不能为空', trigger: 'blur' }
+                    ],                    
+                    password1:[{
+                    	required: true,                    	
+                        pattern: /^^(?![A-Za-z0-9]+$)(?![A-Za-z\W]+$)(?![0-9\W]+$)[a-zA-Z0-9\W]{8,}$/,
+                        message: '密码必须包含英文字符、数字及特殊符号,至少要8位长度',
+                        trigger: 'blur'
+                    }],
+                    password2:[{
+                    	required: true,                    	
+                        pattern: /^^(?![A-Za-z0-9]+$)(?![A-Za-z\W]+$)(?![0-9\W]+$)[a-zA-Z0-9\W]{8,}$/,
+                        message: '密码必须包含英文字符、数字及特殊符号,至少要8位长度',
+                        trigger: 'blur'
+                    }]
+                },
+                logininfoText: '',
+            }
+        },
+        methods: {
+            changeIdentity: function () {
+                this.confirmform.yhbh = '';
+            },
+            onSubmit: function () {
+                var that = this;
+
+                this.$refs['loginform'].validate(function (valid) {
+                    if (valid) {
+                        $.ajax({
+                            type: "post",
+                            url: requesturl + "sign/login",
+                            data: { username: that.loginform.username, mypassword: that.loginform.mypassword },
+                            dataType: "json",
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                            },
+                            success: function (res) {
+                                if (res.code == 1) {
+//                                  that.$refs['loginform'].resetFields();
+                                    localStorage.setItem("name", that.loginform.username);
+                                    window.location.href = "index.html";
+                                } else if (res.code == 2) {
+                                    that.$message(res.message);
+                                    that.passwordVisible = true;
+                                    that.$refs['mmform'].resetFields();
+                                }else {
+                                    that.$message.error(res.message);
+                                }
+                            }
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            passwordyz: function () {
+                var that = this;
+                this.$refs['mmform'].validate(function (valid) {
+                    if (valid) {
+                        if (that.mmform.password1 == that.mmform.password2) {
+                            $.ajax({
+                                type: "post",
+                                url: requesturl + "sign/resetPassword",
+                                data: {
+                                    username: that.loginform.username,
+                                    oldpassowrd: that.mmform.oldpassowrd,
+                                    password1: that.mmform.password1,
+                                    password2: that.mmform.password2
+                                },
+                                dataType: "json",
+                                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                    that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                                },
+                                success: function (res) {
+                                    if (res.code == 1) {
+                                        that.$message({
+                                            showClose: true,
+                                            message: '密码修改成功',
+                                            type: 'success'
+                                        });
+                                        that.passwordVisible = false;
+                                        that.mmform.password1 = '';
+                                        that.mmform.password2 = '';
+                                        that.mmform.oldpassowrd = '';
+                                        that.loginform.mypassword = '';
+                                        that.$refs['mmform'].resetFields();
+                                        localStorage.setItem("name", that.loginform.username);
+                                        window.location.href = "index.html";
+
+                                    } else {
+                                        that.$message.error(res.message);
+                                    }
+                                }
+                            });
+                        } else {
+                            that.$message.error('新密码两次输入不一致！');
+                        }
+                    } else {
+                        return false;
+                    }
+                });
+            }
+        },
+        mounted: function () {
+            // 获取谷歌浏览器版本
+            function getChromeVersion() {
+                var arr = navigator.userAgent.split(' '); 
+                var chromeVersion = '';
+                for(var i=0;i < arr.length;i++){
+                    if(/chrome/i.test(arr[i]))
+                    chromeVersion = arr[i]
+                }
+                if(chromeVersion){
+                    return Number(chromeVersion.split('/')[1].split('.')[0]);
+                } else {
+                    return false;
+                }
+            }
+
+            var userAgent = navigator.userAgent;
+            if (userAgent.indexOf("Chrome") > -1) {
+                if(getChromeVersion()) {
+                var version = getChromeVersion();
+                    console.log(version)
+                    if(version >= 69) {
+                        document.getElementById('browser-chrome').style.display = "none";
+                    }else{
+                        this.$message({
+                            message: '您使用的谷歌Chrome浏览器版本过低，为了更好地体验请将浏览器升级到最新版本！',
+                            type: 'error',
+                            duration: 0
+                        });
+                    }
+                }
+            }
+            if (keyText == "msg") {
+                if (valueText == "999") {
+                    this.logininfoText = "已在其它地方进行了登录，请重新登录！";
+                    this.logininfo = true;
+                }
+            }
+        }
+    })
+</script>
+
+</html>

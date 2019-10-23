@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=Edge">
+		<title>系统管理-最大并发链接数设定</title>
+		<link rel="shortcut icon" href="img/icon.ico" />
+		<link rel="stylesheet" href="elementui/index.css">
+		<link rel="stylesheet" type="text/css" href="css/style.css"/>
+	</head>
+	<body>
+		<div id="app" class="heiall bigcont">
+			<div id="headerwarp"></div>
+			<div class="content">
+			    <div id="navwarp" v-show="!isfold"></div>
+			    <div class="contright" id="content" :class="{'contrtpad':!isfold,'contrtpadno':isfold}">
+			    	<div class="contrighton">
+						<div class="clearfloat contentdiv">
+			    			<el-form  ref="addform" :rules="rules" :inline="true" :model="formInline" class="demo-form-inline">
+							  <el-form-item label="系统最大并发链接数" prop="maxcount">
+								<el-input v-model.trim="formInline.maxcount" :maxlength="4" clearable placeholder="请输入最大值" class="inputmid"></el-input>
+							  </el-form-item>
+							  <el-form-item>
+							    <el-button  type="primary" @click="onSubmit('addform')">确认</el-button>
+							  </el-form-item>
+							</el-form>
+			    		</div>
+			    	</div>
+			    </div>
+			</div>
+		</div>
+	</body>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/vue.js"></script>
+	<script src="elementui/index.js"></script>
+	<script src="js/common.js"></script>
+	<script>
+		var url=location.href.split("?")[0].split("/").pop();
+		new Vue({
+			el: '#app',
+			data: function(){
+				return {
+					formInline: {
+					  maxcount:''
+			        },
+			        canclear: false,
+					isfold: false,
+                    rules: {
+                        maxcount: [{ required: true, message: '不能为空'},
+                            { pattern: /^[0-9]*$/, message: '必须为数字值', trigger: 'blur'}]
+					}
+				}
+			},
+			methods: {
+				/*导航显示与隐藏*/
+				toggle: function(){
+			      	this.isfold = !this.isfold;
+			    },
+			    onSubmit: function(formName) {
+			    	// 显示加载动画
+			        var that=this;
+                    this.$refs[formName].validate(function (valid) {
+                        if (valid) {
+                            vehlic.ajax({
+                                type:"post",
+                                url:requesturl+"mostLink/saveInfo",
+                                data: {
+                                    maxcount:that.formInline.maxcount
+                                },
+                                dataType: "json",
+                                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                                    that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+                                },
+                                success: function(res) {
+                                    if(res.code==1){
+                                        that.$message.success(res.message);
+                                        // 隐藏加载动画
+                                    }else{
+                                        that.$message.error(res.message);
+                                    }
+                                }
+                            });
+                        } else {
+                            return false;
+                        }
+                    });
+			    },
+                getInfo: function(){
+					var that=this;
+			        vehlic.ajax({
+						type:"get",
+						url:requesturl+"mostLink/getInfo",
+						dataType: "json",
+						error: function(XMLHttpRequest, textStatus, errorThrown) {
+							that.$message.error('请求失败或登录失效，请检查网络或刷新重试！');
+						},
+						success: function(res) {
+							if(res.code==1){
+								// 隐藏加载动画
+								if(res.data==null)
+								{
+								  that.formInline.maxcount=0;
+								}else
+								{
+								  that.formInline.maxcount = res.data.maxcount;
+								}
+							}else{
+								that.$message.error(res.message);
+							}						
+						}
+					});
+				}
+			},
+			mounted: function(){
+				this.getInfo();
+			}
+		})
+	</script>
+</html>

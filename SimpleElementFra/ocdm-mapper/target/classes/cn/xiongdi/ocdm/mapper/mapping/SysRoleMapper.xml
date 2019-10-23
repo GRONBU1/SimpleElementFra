@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xiongdi.ocdm.mapper.dao.SysRoleMapper">
+  <resultMap id="BaseResultMap" type="cn.xiongdi.ocdm.mapper.model.SysRole">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="jsbh" jdbcType="CHAR" property="jsbh" />
+    <result column="mc" jdbcType="CHAR" property="mc" />
+    <result column="sfqy" jdbcType="CHAR" property="sfqy" />
+    <result column="bz" jdbcType="CHAR" property="bz" />
+    <result column="sfjy" jdbcType="CHAR" property="sfjy" />
+    <result column="jslb" jdbcType="CHAR" property="jslb" />
+    <result column="jsyzm" jdbcType="VARCHAR" property="jsyzm" />
+    <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
+    <result column="createuid" jdbcType="CHAR" property="createuid" />
+    <result column="createip" jdbcType="CHAR" property="createip" />
+    <result column="updatetime" jdbcType="TIMESTAMP" property="updatetime" />
+    <result column="updateuid" jdbcType="CHAR" property="updateuid" />
+    <result column="updateip" jdbcType="CHAR" property="updateip" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, jsbh, mc, sfqy, bz, sfjy, jslb, jsyzm, createtime, createuid, createip, updatetime, 
+    updateuid, updateip
+  </sql>
+
+  <!--获取角色信息-->
+  <select id="selectRoleInfo"  resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sys_role
+  </select>
+  <select id="checkInfo" parameterType="cn.xiongdi.ocdm.mapper.model.SysRole" resultType="java.lang.Integer">
+    select
+    count(0)
+    from sys_role
+    <where>
+    <if test="mc != null and mc != ''">
+      and mc = #{mc,jdbcType=CHAR}
+    </if>
+    <if test="id != null">
+      and id != #{id,jdbcType=BIGINT}
+    </if>
+    </where>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_role
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectByJslb" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sys_role
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from sys_role
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="cn.xiongdi.ocdm.mapper.model.SysRole">
+    insert into sys_role (id, jsbh, mc, sfqy, 
+      bz, sfjy, jslb, jsyzm, 
+      createtime, createuid, createip, 
+      updatetime, updateuid, updateip
+      )
+    values (#{id,jdbcType=BIGINT}, #{jsbh,jdbcType=CHAR}, #{mc,jdbcType=CHAR}, #{sfqy,jdbcType=CHAR}, 
+      #{bz,jdbcType=CHAR}, #{sfjy,jdbcType=CHAR}, #{jslb,jdbcType=CHAR}, #{jsyzm,jdbcType=VARCHAR}, 
+      #{createtime,jdbcType=TIMESTAMP}, #{createuid,jdbcType=CHAR}, #{createip,jdbcType=CHAR}, 
+      #{updatetime,jdbcType=TIMESTAMP}, #{updateuid,jdbcType=CHAR}, #{updateip,jdbcType=CHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="cn.xiongdi.ocdm.mapper.model.SysRole">
+    insert into sys_role
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="jsbh != null">
+        jsbh,
+      </if>
+      <if test="mc != null">
+        mc,
+      </if>
+      <if test="sfqy != null">
+        sfqy,
+      </if>
+      <if test="bz != null">
+        bz,
+      </if>
+      <if test="sfjy != null">
+        sfjy,
+      </if>
+      <if test="jslb != null">
+        jslb,
+      </if>
+      <if test="jsyzm != null">
+        jsyzm,
+      </if>
+      <if test="createtime != null">
+        createtime,
+      </if>
+      <if test="createuid != null">
+        createuid,
+      </if>
+      <if test="createip != null">
+        createip,
+      </if>
+      <if test="updatetime != null">
+        updatetime,
+      </if>
+      <if test="updateuid != null">
+        updateuid,
+      </if>
+      <if test="updateip != null">
+        updateip,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="jsbh != null">
+        #{jsbh,jdbcType=CHAR},
+      </if>
+      <if test="mc != null">
+        #{mc,jdbcType=CHAR},
+      </if>
+      <if test="sfqy != null">
+        #{sfqy,jdbcType=CHAR},
+      </if>
+      <if test="bz != null">
+        #{bz,jdbcType=CHAR},
+      </if>
+      <if test="sfjy != null">
+        #{sfjy,jdbcType=CHAR},
+      </if>
+      <if test="jslb != null">
+        #{jslb,jdbcType=CHAR},
+      </if>
+      <if test="jsyzm != null">
+        #{jsyzm,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null">
+        #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createuid != null">
+        #{createuid,jdbcType=CHAR},
+      </if>
+      <if test="createip != null">
+        #{createip,jdbcType=CHAR},
+      </if>
+      <if test="updatetime != null">
+        #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateuid != null">
+        #{updateuid,jdbcType=CHAR},
+      </if>
+      <if test="updateip != null">
+        #{updateip,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.xiongdi.ocdm.mapper.model.SysRole">
+    update sys_role
+    <set>
+      <if test="jsbh != null">
+        jsbh = #{jsbh,jdbcType=CHAR},
+      </if>
+      <if test="mc != null">
+        mc = #{mc,jdbcType=CHAR},
+      </if>
+      <if test="sfqy != null">
+        sfqy = #{sfqy,jdbcType=CHAR},
+      </if>
+      <if test="bz != null">
+        bz = #{bz,jdbcType=CHAR},
+      </if>
+      <if test="sfjy != null">
+        sfjy = #{sfjy,jdbcType=CHAR},
+      </if>
+      <if test="jslb != null">
+        jslb = #{jslb,jdbcType=CHAR},
+      </if>
+      <if test="jsyzm != null">
+        jsyzm = #{jsyzm,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null">
+        createtime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createuid != null">
+        createuid = #{createuid,jdbcType=CHAR},
+      </if>
+      <if test="createip != null">
+        createip = #{createip,jdbcType=CHAR},
+      </if>
+      <if test="updatetime != null">
+        updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateuid != null">
+        updateuid = #{updateuid,jdbcType=CHAR},
+      </if>
+      <if test="updateip != null">
+        updateip = #{updateip,jdbcType=CHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.xiongdi.ocdm.mapper.model.SysRole">
+    update sys_role
+    set jsbh = #{jsbh,jdbcType=CHAR},
+      mc = #{mc,jdbcType=CHAR},
+      sfqy = #{sfqy,jdbcType=CHAR},
+      bz = #{bz,jdbcType=CHAR},
+      sfjy = #{sfjy,jdbcType=CHAR},
+      jslb = #{jslb,jdbcType=CHAR},
+      jsyzm = #{jsyzm,jdbcType=VARCHAR},
+      createtime = #{createtime,jdbcType=TIMESTAMP},
+      createuid = #{createuid,jdbcType=CHAR},
+      createip = #{createip,jdbcType=CHAR},
+      updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      updateuid = #{updateuid,jdbcType=CHAR},
+      updateip = #{updateip,jdbcType=CHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

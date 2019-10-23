@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.xiongdi.ocdm.mapper.dao.SysUserWhereSqlMapper" >
+  <resultMap id="BaseResultMap" type="cn.xiongdi.ocdm.mapper.model.SysUserWhereSql" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="yhm" property="yhm" jdbcType="VARCHAR" />
+    <result column="kh" property="kh" jdbcType="VARCHAR" />
+    <result column="zd" property="zd" jdbcType="VARCHAR" />
+    <result column="tj" property="tj" jdbcType="VARCHAR" />
+    <result column="srz" property="srz" jdbcType="VARCHAR" />
+    <result column="fkh" property="fkh" jdbcType="VARCHAR" />
+    <result column="gx" property="gx" jdbcType="VARCHAR" />
+    <result column="deteleflag" property="deteleflag" jdbcType="INTEGER" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" />
+    <result column="createuid" property="createuid" jdbcType="VARCHAR" />
+    <result column="createip" property="createip" jdbcType="CHAR" />
+    <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" />
+    <result column="updateuid" property="updateuid" jdbcType="VARCHAR" />
+    <result column="updateip" property="updateip" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, yhm, kh, zd, tj, srz, fkh, gx,deteleflag, createtime, createuid, createip, updatetime, updateuid,
+    updateip
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_userwheresql
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="getUserWhereField" resultMap="BaseResultMap" parameterType="java.lang.Object" >
+    select
+    <include refid="Base_Column_List" />
+    from sys_userwheresql
+   <where>
+     <if test="yhm!=null and yhm!=''">
+      AND yhm=#{yhm,jdbcType=VARCHAR}
+     </if>
+     <if test="yhm==null">
+       AND yhm=''
+     </if>
+     <if test="deteleflag!=null">
+       AND deteleflag=#{deteleflag,jdbcType=INTEGER}
+     </if>
+   </where>
+   order by id ASC
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from sys_userwheresql
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="updateByYhm" parameterType="java.lang.String" >
+    update sys_userwheresql set deteleflag=1
+    where yhm = #{yhm,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByYhm" parameterType="java.lang.Object" >
+    DELETE
+    FROM
+        sys_userwheresql
+    WHERE
+        yhm = #{yhm,jdbcType=VARCHAR}
+    AND deteleflag = 1
+    LIMIT #{rownum}
+  </delete>
+  <insert id="insert" parameterType="cn.xiongdi.ocdm.mapper.model.SysUserWhereSql" >
+    insert into sys_userwheresql (id, yhm, kh, zd, 
+      tj, srz, fkh, gx, deteleflag,
+      createtime, createuid, createip, 
+      updatetime, updateuid, updateip
+      )
+    values (#{id,jdbcType=BIGINT}, #{yhm,jdbcType=VARCHAR}, #{kh,jdbcType=VARCHAR}, #{zd,jdbcType=VARCHAR}, 
+      #{tj,jdbcType=VARCHAR}, #{srz,jdbcType=VARCHAR}, #{fkh,jdbcType=VARCHAR}, #{gx,jdbcType=VARCHAR}, #{deteleflag,jdbcType=INTEGER},
+      #{createtime,jdbcType=TIMESTAMP}, #{createuid,jdbcType=VARCHAR}, #{createip,jdbcType=CHAR}, 
+      #{updatetime,jdbcType=TIMESTAMP}, #{updateuid,jdbcType=VARCHAR}, #{updateip,jdbcType=CHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="cn.xiongdi.ocdm.mapper.model.SysUserWhereSql" >
+    insert into sys_userwheresql
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="yhm != null" >
+        yhm,
+      </if>
+      <if test="kh != null" >
+        kh,
+      </if>
+      <if test="zd != null" >
+        zd,
+      </if>
+      <if test="tj != null" >
+        tj,
+      </if>
+      <if test="srz != null" >
+        srz,
+      </if>
+      <if test="fkh != null" >
+        fkh,
+      </if>
+      <if test="gx != null" >
+        gx,
+      </if>
+      <if test="deteleflag != null" >
+        deteleflag,
+      </if>
+      <if test="createtime != null" >
+        createtime,
+      </if>
+      <if test="createuid != null" >
+        createuid,
+      </if>
+      <if test="createip != null" >
+        createip,
+      </if>
+      <if test="updatetime != null" >
+        updatetime,
+      </if>
+      <if test="updateuid != null" >
+        updateuid,
+      </if>
+      <if test="updateip != null" >
+        updateip,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="yhm != null" >
+        #{yhm,jdbcType=VARCHAR},
+      </if>
+      <if test="kh != null" >
+        #{kh,jdbcType=VARCHAR},
+      </if>
+      <if test="zd != null" >
+        #{zd,jdbcType=VARCHAR},
+      </if>
+      <if test="tj != null" >
+        #{tj,jdbcType=VARCHAR},
+      </if>
+      <if test="srz != null" >
+        #{srz,jdbcType=VARCHAR},
+      </if>
+      <if test="fkh != null" >
+        #{fkh,jdbcType=VARCHAR},
+      </if>
+      <if test="gx != null" >
+        #{gx,jdbcType=VARCHAR},
+      </if>
+      <if test="deteleflag != null" >
+        #{deteleflag,jdbcType=INTEGER},
+      </if>
+      <if test="createtime != null" >
+        #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createuid != null" >
+        #{createuid,jdbcType=VARCHAR},
+      </if>
+      <if test="createip != null" >
+        #{createip,jdbcType=CHAR},
+      </if>
+      <if test="updatetime != null" >
+        #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateuid != null" >
+        #{updateuid,jdbcType=VARCHAR},
+      </if>
+      <if test="updateip != null" >
+        #{updateip,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.xiongdi.ocdm.mapper.model.SysUserWhereSql" >
+    update sys_userwheresql
+    <set >
+      <if test="yhm != null" >
+        yhm = #{yhm,jdbcType=VARCHAR},
+      </if>
+      <if test="kh != null" >
+        kh = #{kh,jdbcType=VARCHAR},
+      </if>
+      <if test="zd != null" >
+        zd = #{zd,jdbcType=VARCHAR},
+      </if>
+      <if test="tj != null" >
+        tj = #{tj,jdbcType=VARCHAR},
+      </if>
+      <if test="srz != null" >
+        srz = #{srz,jdbcType=VARCHAR},
+      </if>
+      <if test="fkh != null" >
+        fkh = #{fkh,jdbcType=VARCHAR},
+      </if>
+      <if test="gx != null" >
+        gx = #{gx,jdbcType=VARCHAR},
+      </if>
+      <if test="deteleflag != null" >
+        deteleflag = #{deteleflag,jdbcType=INTEGER},
+      </if>
+      <if test="createtime != null" >
+        createtime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createuid != null" >
+        createuid = #{createuid,jdbcType=VARCHAR},
+      </if>
+      <if test="createip != null" >
+        createip = #{createip,jdbcType=CHAR},
+      </if>
+      <if test="updatetime != null" >
+        updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateuid != null" >
+        updateuid = #{updateuid,jdbcType=VARCHAR},
+      </if>
+      <if test="updateip != null" >
+        updateip = #{updateip,jdbcType=CHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.xiongdi.ocdm.mapper.model.SysUserWhereSql" >
+    update sys_userwheresql
+    set yhm = #{yhm,jdbcType=VARCHAR},
+      kh = #{kh,jdbcType=VARCHAR},
+      zd = #{zd,jdbcType=VARCHAR},
+      tj = #{tj,jdbcType=VARCHAR},
+      srz = #{srz,jdbcType=VARCHAR},
+      fkh = #{fkh,jdbcType=VARCHAR},
+      gx = #{gx,jdbcType=VARCHAR},
+      deteleflag = #{deteleflag,jdbcType=INTEGER},
+      createtime = #{createtime,jdbcType=TIMESTAMP},
+      createuid = #{createuid,jdbcType=VARCHAR},
+      createip = #{createip,jdbcType=CHAR},
+      updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      updateuid = #{updateuid,jdbcType=VARCHAR},
+      updateip = #{updateip,jdbcType=CHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

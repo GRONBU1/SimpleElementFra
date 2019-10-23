@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xiongdi.ocdm.mapper.dao.SysUserMapper">
+  <resultMap id="BaseResultMap" type="cn.xiongdi.ocdm.mapper.model.SysUser">
+    <id column="userid" jdbcType="CHAR" property="userid" />
+    <result column="yhm" jdbcType="CHAR" property="yhm" />
+    <result column="mm" jdbcType="VARCHAR" property="mm" />
+    <result column="xm" jdbcType="VARCHAR" property="xm" />
+    <result column="sfzh" jdbcType="VARCHAR" property="sfzh" />
+    <result column="lxdh" jdbcType="VARCHAR" property="lxdh" />
+    <result column="jsbhid" jdbcType="BIGINT" property="jsbhid" />
+    <result column="iplist" jdbcType="VARCHAR" property="iplist" />
+    <result column="zhmm" jdbcType="VARCHAR" property="zhmm" />
+    <result column="yhbh" jdbcType="VARCHAR" property="yhbh" />
+    <result column="yhzt" jdbcType="CHAR" property="yhzt" />
+    <result column="tyyy" jdbcType="VARCHAR" property="tyyy" />
+    <result column="sfjy" jdbcType="VARCHAR" property="sfjy" />
+    <result column="yhyxq" jdbcType="TIMESTAMP" property="yhyxq" />
+    <result column="mmyxq" jdbcType="TIMESTAMP" property="mmyxq" />
+    <result column="dlsjks" jdbcType="CHAR" property="dlsjks" />
+    <result column="dlsjdjs" jdbcType="CHAR" property="dlsjdjs" />
+    <result column="dlzt" jdbcType="CHAR" property="dlzt" />
+    <result column="xtsj" jdbcType="TIMESTAMP" property="xtsj" />
+    <result column="dlip" jdbcType="CHAR" property="dlip" />
+    <result column="scdlsj" jdbcType="TIMESTAMP" property="scdlsj" />
+    <result column="dlsbcs" jdbcType="CHAR" property="dlsbcs" />
+    <result column="yhdlcs" jdbcType="BIGINT" property="yhdlcs" />
+    <result column="bz2" jdbcType="VARCHAR" property="bz2" />
+    <result column="bz3" jdbcType="VARCHAR" property="bz3" />
+    <result column="jsmc" jdbcType="VARCHAR" property="jsmc" />
+    <result column="deleteflg" jdbcType="BIGINT" property="deleteflg" />
+    <result column="ssdw" jdbcType="BIGINT" property="ssdw" />
+    <result column="sjhm" jdbcType="VARCHAR" property="sjhm" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="xb" jdbcType="CHAR" property="xb" />
+    <result column="dwmc" jdbcType="CHAR" property="dwmc" />
+    <result column="jslb" jdbcType="CHAR" property="jslb" />
+    <result column="updateip" jdbcType="CHAR" property="updateip" />
+    <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
+    <result column="createuid" jdbcType="CHAR" property="createuid" />
+    <result column="createip" jdbcType="CHAR" property="createip" />
+    <result column="updatetime" jdbcType="TIMESTAMP" property="updatetime" />
+    <result column="updateuid" jdbcType="CHAR" property="updateuid" />
+    <result column="updateip" jdbcType="CHAR" property="updateip" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    t.userid, t.yhm, t.mm,
+    CONVERT(AES_DECRYPT(t.xm,#{encryptkey,jdbcType=CHAR}) USING utf8) xm,
+    CONVERT(AES_DECRYPT(t.sfzh,#{encryptkey,jdbcType=CHAR}) USING utf8) sfzh,
+    CONVERT(AES_DECRYPT(t.lxdh,#{encryptkey,jdbcType=CHAR}) USING utf8) lxdh,
+    t.jsbhid, t.iplist, t.zhmm, t.yhbh, t.yhzt, t.tyyy, t.sfjy, t.yhyxq,
+    t.mmyxq, t.dlsjks, t.dlsjdjs, t.dlzt, t.xtsj, t.dlip, t.scdlsj, t.dlsbcs, t.yhdlcs, t.bz2, t.bz3, t.jsmc,
+    t.deleteflg,t.ssdw,t.sjhm,t.email,t.xb, t.createtime, t.createuid, t.createip, t.updatetime, t.updateuid, t.updateip
+  </sql>
+  <select id="selectCount" parameterType="java.lang.String" resultType="java.lang.Integer">
+    select 
+      count(0)
+    from sys_user
+    where deleteflg = 0
+    <if test="yhm != null and yhm != ''">
+      AND yhm LIKE concat(concat('%' ,CONCAT('/',#{yhm,jdbcType=CHAR})), '%') ESCAPE '/'
+    </if>
+  </select>
+  <select id="selectZXYHS" resultType="java.lang.Integer">
+    select
+    count(dlzt)
+    from sys_user
+    where deleteflg = 0
+    and dlzt='1'
+  </select>
+  <select id="selectYhmOfCheck" parameterType="cn.xiongdi.ocdm.mapper.model.SysUser" resultType="java.lang.Integer">
+    select
+    count(0)
+    from sys_user
+    where deleteflg = 0
+    <if test="yhm != null and yhm != ''">
+      and yhm = #{yhm,jdbcType=CHAR}
+    </if>
+    <if test="userid != null and userid != ''">
+      and userid <![CDATA[<>]]> #{userid,jdbcType=CHAR}
+    </if>
+  </select>
+  <select id="selectByUserList" parameterType="cn.xiongdi.ocdm.mapper.model.SysUser" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    ,
+    m.mc as jslb,
+    so.dwmc as dwmc
+    from sys_user t
+    LEFT JOIN sys_organization so ON t.ssdw = so.id
+    LEFT JOIN sys_role m on t.jsbhid = m.id
+    where t.deleteflg = 0
+    <if test="yhm != null and yhm != ''">
+      AND t.yhm LIKE concat(concat('%' ,CONCAT('/',#{yhm,jdbcType=CHAR})), '%') ESCAPE '/'
+    </if>
+    <if test="ssdw != null and ssdw != ''">
+      AND t.ssdw = #{ssdw,jdbcType=BIGINT}
+    </if>
+    <if test="orderBy != null and orderBy != ''">
+      order by ${orderBy}
+    </if>
+    <if test="startindex != null">
+      LIMIT #{startindex,jdbcType=BIGINT} , #{pagesize,jdbcType=INTEGER}
+    </if>
+  </select>
+  <select id="selectByUserId" parameterType="cn.xiongdi.ocdm.mapper.model.SysUser" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sys_user t
+    where t.deleteflg = 0
+    and t.userid = #{userid,jdbcType=CHAR}
+  </select>
+  <select id="selectByUserName" parameterType="cn.xiongdi.ocdm.mapper.model.SysUser" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sys_user t
+    where t.deleteflg = 0
+    and t.yhm = #{yhm,jdbcType=CHAR}
+  </select>
+  <insert id="insert" parameterType="cn.xiongdi.ocdm.mapper.model.SysUser">
+    insert into sys_user (userid, yhm, mm, xm, 
+      sfzh, lxdh, jsbhid, 
+      iplist, zhmm, yhbh, 
+      yhzt, tyyy, sfjy, yhyxq, 
+      mmyxq, dlsjks, dlsjdjs, 
+      dlzt, xtsj, dlip, scdlsj, 
+      dlsbcs, yhdlcs, bz2, bz3, 
+      jsmc, deleteflg,ssdw,sjhm,email,xb, createtime,
+      createuid, createip, updatetime, 
+      updateuid, updateip)
+    values (#{userid,jdbcType=CHAR}, #{yhm,jdbcType=CHAR}, #{mm,jdbcType=VARCHAR}, #{xm,jdbcType=VARCHAR}, 
+      #{sfzh,jdbcType=VARCHAR}, #{lxdh,jdbcType=VARCHAR}, #{jsbhid,jdbcType=BIGINT}, 
+      #{iplist,jdbcType=VARCHAR}, #{zhmm,jdbcType=VARCHAR}, #{yhbh,jdbcType=VARCHAR}, 
+      #{yhzt,jdbcType=CHAR}, #{tyyy,jdbcType=VARCHAR}, #{sfjy,jdbcType=VARCHAR}, #{yhyxq,jdbcType=TIMESTAMP}, 
+      #{mmyxq,jdbcType=TIMESTAMP}, #{dlsjks,jdbcType=CHAR}, #{dlsjdjs,jdbcType=CHAR}, 
+      #{dlzt,jdbcType=CHAR}, #{xtsj,jdbcType=TIMESTAMP}, #{dlip,jdbcType=CHAR}, #{scdlsj,jdbcType=TIMESTAMP}, 
+      #{dlsbcs,jdbcType=CHAR}, #{yhdlcs,jdbcType=BIGINT}, #{bz2,jdbcType=VARCHAR}, #{bz3,jdbcType=VARCHAR}, 
+      #{jsmc,jdbcType=VARCHAR}, #{deleteflg,jdbcType=BIGINT},#{ssdw,jdbcType=BIGINT},#{sjhm,jdbcType=VARCHAR},
+      #{email,jdbcType=VARCHAR},#{xb,jdbcType=CHAR}, #{createtime,jdbcType=TIMESTAMP},
+      #{createuid,jdbcType=CHAR}, #{createip,jdbcType=CHAR}, #{updatetime,jdbcType=TIMESTAMP}, 
+      #{updateuid,jdbcType=CHAR}, #{updateip,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="cn.xiongdi.ocdm.mapper.model.SysUser">
+    insert into sys_user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="userid != null">
+        userid,
+      </if>
+      <if test="yhm != null">
+        yhm,
+      </if>
+      <if test="mm != null">
+        mm,
+      </if>
+      <if test="xm != null">
+        xm,
+      </if>
+      <if test="sfzh != null">
+        sfzh,
+      </if>
+      <if test="lxdh != null">
+        lxdh,
+      </if>
+      <if test="jsbhid != null">
+        jsbhid,
+      </if>
+      <if test="iplist != null">
+        iplist,
+      </if>
+      <if test="zhmm != null">
+        zhmm,
+      </if>
+      <if test="yhbh != null">
+        yhbh,
+      </if>
+      <if test="yhzt != null">
+        yhzt,
+      </if>
+      <if test="tyyy != null">
+        tyyy,
+      </if>
+      <if test="sfjy != null">
+        sfjy,
+      </if>
+      <if test="yhyxq != null">
+        yhyxq,
+      </if>
+      <if test="mmyxq != null">
+        mmyxq,
+      </if>
+      <if test="dlsjks != null">
+        dlsjks,
+      </if>
+      <if test="dlsjdjs != null">
+        dlsjdjs,
+      </if>
+      <if test="dlzt != null">
+        dlzt,
+      </if>
+      <if test="xtsj != null">
+        xtsj,
+      </if>
+      <if test="dlip != null">
+        dlip,
+      </if>
+      <if test="scdlsj != null">
+        scdlsj,
+      </if>
+      <if test="dlsbcs != null">
+        dlsbcs,
+      </if>
+      <if test="yhdlcs != null">
+        yhdlcs,
+      </if>
+      <if test="bz2 != null">
+        bz2,
+      </if>
+      <if test="bz3 != null">
+        bz3,
+      </if>
+      <if test="jsmc != null">
+        jsmc,
+      </if>
+      <if test="deleteflg != null">
+        deleteflg,
+      </if>
+      <if test="ssdw != null">
+        ssdw,
+      </if>
+      <if test="sjhm != null">
+        sjhm,
+      </if>
+      <if test="email != null">
+        email,
+      </if>
+      <if test="xb != null">
+        xb,
+      </if>
+      <if test="createtime != null">
+        createtime,
+      </if>
+      <if test="createuid != null">
+        createuid,
+      </if>
+      <if test="createip != null">
+        createip,
+      </if>
+      <if test="updatetime != null">
+        updatetime,
+      </if>
+      <if test="updateuid != null">
+        updateuid,
+      </if>
+      <if test="updateip != null">
+        updateip,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="userid != null">
+        #{userid,jdbcType=CHAR},
+      </if>
+      <if test="yhm != null">
+        #{yhm,jdbcType=CHAR},
+      </if>
+      <if test="mm != null">
+        #{mm,jdbcType=VARCHAR},
+      </if>
+      <if test="xm != null">
+        AES_ENCRYPT( #{xm,jdbcType=VARCHAR},#{encryptkey,jdbcType=VARCHAR}),
+      </if>
+      <if test="sfzh != null">
+        AES_ENCRYPT( #{sfzh,jdbcType=VARCHAR},#{encryptkey,jdbcType=VARCHAR}),
+      </if>
+      <if test="lxdh != null">
+        AES_ENCRYPT( #{lxdh,jdbcType=VARCHAR},#{encryptkey,jdbcType=VARCHAR}),
+      </if>
+      <if test="jsbhid != null">
+        #{jsbhid,jdbcType=BIGINT},
+      </if>
+      <if test="iplist != null">
+        #{iplist,jdbcType=VARCHAR},
+      </if>
+      <if test="zhmm != null">
+        #{zhmm,jdbcType=VARCHAR},
+      </if>
+      <if test="yhbh != null">
+        #{yhbh,jdbcType=VARCHAR},
+      </if>
+      <if test="yhzt != null">
+        #{yhzt,jdbcType=CHAR},
+      </if>
+      <if test="tyyy != null">
+        #{tyyy,jdbcType=VARCHAR},
+      </if>
+      <if test="sfjy != null">
+        #{sfjy,jdbcType=VARCHAR},
+      </if>
+      <if test="yhyxq != null">
+        #{yhyxq,jdbcType=TIMESTAMP},
+      </if>
+      <if test="mmyxq != null">
+        #{mmyxq,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dlsjks != null">
+        #{dlsjks,jdbcType=CHAR},
+      </if>
+      <if test="dlsjdjs != null">
+        #{dlsjdjs,jdbcType=CHAR},
+      </if>
+      <if test="dlzt != null">
+        #{dlzt,jdbcType=CHAR},
+      </if>
+      <if test="xtsj != null">
+        #{xtsj,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dlip != null">
+        #{dlip,jdbcType=CHAR},
+      </if>
+      <if test="scdlsj != null">
+        #{scdlsj,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dlsbcs != null">
+        #{dlsbcs,jdbcType=CHAR},
+      </if>
+      <if test="yhdlcs != null">
+        #{yhdlcs,jdbcType=BIGINT},
+      </if>
+      <if test="bz2 != null">
+        #{bz2,jdbcType=VARCHAR},
+      </if>
+      <if test="bz3 != null">
+        #{bz3,jdbcType=VARCHAR},
+      </if>
+      <if test="jsmc != null">
+        #{jsmc,jdbcType=VARCHAR},
+      </if>
+      <if test="deleteflg != null">
+        #{deleteflg,jdbcType=BIGINT},
+      </if>
+      <if test="ssdw != null">
+        #{ssdw,jdbcType=BIGINT},
+      </if>
+      <if test="sjhm != null">
+        #{sjhm,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="xb != null">
+        #{xb,jdbcType=CHAR},
+      </if>
+      <if test="createtime != null">
+        #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createuid != null">
+        #{createuid,jdbcType=CHAR},
+      </if>
+      <if test="createip != null">
+        #{createip,jdbcType=CHAR},
+      </if>
+      <if test="updatetime != null">
+        #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateuid != null">
+        #{updateuid,jdbcType=CHAR},
+      </if>
+      <if test="updateip != null">
+        #{updateip,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.xiongdi.ocdm.mapper.model.SysUser">
+    update sys_user
+    <set>
+      <if test="yhm != null">
+        yhm = #{yhm,jdbcType=CHAR},
+      </if>
+      <if test="mm != null">
+        mm = #{mm,jdbcType=VARCHAR},
+      </if>
+      <if test="xm != null">
+        xm = AES_ENCRYPT( #{xm,jdbcType=VARCHAR},#{encryptkey,jdbcType=VARCHAR}),
+      </if>
+      <if test="sfzh != null">
+        sfzh = AES_ENCRYPT( #{sfzh,jdbcType=VARCHAR},#{encryptkey,jdbcType=VARCHAR}),
+      </if>
+      <if test="lxdh != null">
+        lxdh = AES_ENCRYPT( #{lxdh,jdbcType=VARCHAR},#{encryptkey,jdbcType=VARCHAR}),
+      </if>
+      <if test="jsbhid != null">
+        jsbhid = #{jsbhid,jdbcType=BIGINT},
+      </if>
+      <if test="iplist != null">
+        iplist = #{iplist,jdbcType=VARCHAR},
+      </if>
+      <if test="zhmm != null">
+        zhmm = #{zhmm,jdbcType=VARCHAR},
+      </if>
+      <if test="yhbh != null">
+        yhbh = #{yhbh,jdbcType=VARCHAR},
+      </if>
+      <if test="yhzt != null">
+        yhzt = #{yhzt,jdbcType=CHAR},
+      </if>
+      <if test="tyyy != null">
+        tyyy = #{tyyy,jdbcType=VARCHAR},
+      </if>
+      <if test="sfjy != null">
+        sfjy = #{sfjy,jdbcType=VARCHAR},
+      </if>
+      <if test="yhyxq != null">
+        yhyxq = #{yhyxq,jdbcType=TIMESTAMP},
+      </if>
+      <if test="mmyxq != null">
+        mmyxq = #{mmyxq,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dlsjks != null">
+        dlsjks = #{dlsjks,jdbcType=CHAR},
+      </if>
+      <if test="dlsjdjs != null">
+        dlsjdjs = #{dlsjdjs,jdbcType=CHAR},
+      </if>
+      <if test="dlzt != null">
+        dlzt = #{dlzt,jdbcType=CHAR},
+      </if>
+      <if test="xtsj != null">
+        xtsj = #{xtsj,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dlip != null">
+        dlip = #{dlip,jdbcType=CHAR},
+      </if>
+      <if test="scdlsj != null">
+        scdlsj = #{scdlsj,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dlsbcs != null">
+        dlsbcs = #{dlsbcs,jdbcType=CHAR},
+      </if>
+      <if test="yhdlcs != null">
+        yhdlcs = #{yhdlcs,jdbcType=BIGINT},
+      </if>
+      <if test="bz2 != null">
+        bz2 = #{bz2,jdbcType=VARCHAR},
+      </if>
+      <if test="bz3 != null">
+        bz3 = #{bz3,jdbcType=VARCHAR},
+      </if>
+      <if test="jsmc != null">
+        jsmc = #{jsmc,jdbcType=VARCHAR},
+      </if>
+      <if test="deleteflg != null">
+        deleteflg = #{deleteflg,jdbcType=BIGINT},
+      </if>
+      <if test="ssdw != null">
+        ssdw = #{ssdw,jdbcType=BIGINT},
+      </if>
+      <if test="sjhm != null">
+        sjhm = #{sjhm,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="xb != null">
+        xb = #{xb,jdbcType=CHAR},
+      </if>
+      <if test="createtime != null">
+        createtime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createuid != null">
+        createuid = #{createuid,jdbcType=CHAR},
+      </if>
+      <if test="createip != null">
+        createip = #{createip,jdbcType=CHAR},
+      </if>
+      <if test="updatetime != null">
+        updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateuid != null">
+        updateuid = #{updateuid,jdbcType=CHAR},
+      </if>
+      <if test="updateip != null">
+        updateip = #{updateip,jdbcType=CHAR},
+      </if>
+    </set>
+    where userid = #{userid,jdbcType=CHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.xiongdi.ocdm.mapper.model.SysUser">
+    update sys_user
+    set yhm = #{yhm,jdbcType=CHAR},
+      mm = #{mm,jdbcType=VARCHAR},
+      xm = #{xm,jdbcType=VARCHAR},
+      sfzh = #{sfzh,jdbcType=VARCHAR},
+      lxdh = #{lxdh,jdbcType=VARCHAR},
+      jsbhid = #{jsbhid,jdbcType=BIGINT},
+      iplist = #{iplist,jdbcType=VARCHAR},
+      zhmm = #{zhmm,jdbcType=VARCHAR},
+      yhbh = #{yhbh,jdbcType=VARCHAR},
+      yhzt = #{yhzt,jdbcType=CHAR},
+      tyyy = #{tyyy,jdbcType=VARCHAR},
+      sfjy = #{sfjy,jdbcType=VARCHAR},
+      yhyxq = #{yhyxq,jdbcType=TIMESTAMP},
+      mmyxq = #{mmyxq,jdbcType=TIMESTAMP},
+      dlsjks = #{dlsjks,jdbcType=CHAR},
+      dlsjdjs = #{dlsjdjs,jdbcType=CHAR},
+      dlzt = #{dlzt,jdbcType=CHAR},
+      xtsj = #{xtsj,jdbcType=TIMESTAMP},
+      dlip = #{dlip,jdbcType=CHAR},
+      scdlsj = #{scdlsj,jdbcType=TIMESTAMP},
+      dlsbcs = #{dlsbcs,jdbcType=CHAR},
+      yhdlcs = #{yhdlcs,jdbcType=BIGINT},
+      bz2 = #{bz2,jdbcType=VARCHAR},
+      bz3 = #{bz3,jdbcType=VARCHAR},
+      jsmc = #{jsmc,jdbcType=VARCHAR},
+      deleteflg = #{deleteflg,jdbcType=BIGINT},
+      ssdw = #{ssdw,jdbcType=BIGINT},
+      sjhm = #{sjhm,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      xb = #{xb,jdbcType=CHAR},
+      createtime = #{createtime,jdbcType=TIMESTAMP},
+      createuid = #{createuid,jdbcType=CHAR},
+      createip = #{createip,jdbcType=CHAR},
+      updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      updateuid = #{updateuid,jdbcType=CHAR},
+      updateip = #{updateip,jdbcType=CHAR}
+    where userid = #{userid,jdbcType=CHAR}
+  </update>
+
+  <select id="selectOnLimeCount"  resultType="java.lang.Integer">
+    select
+    count(0)
+    from sys_user
+    where dlzt = '1'
+  </select>
+</mapper>
